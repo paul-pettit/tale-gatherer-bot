@@ -13,7 +13,7 @@ export default function Index() {
       {/* Hero Section with Background Image */}
       <div className="relative min-h-[80vh] flex items-center">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1506744038136-46273834b3fb')] bg-cover bg-center" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/80 to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/40" />
         
         <div className="container mx-auto px-4 py-24 relative">
           <div className="text-center space-y-8 max-w-4xl mx-auto">
@@ -21,25 +21,25 @@ export default function Index() {
               <img 
                 src="/lovable-uploads/ff964a7f-566d-4e85-9216-ac611ea1bb51.png"
                 alt="MemoryStitcher"
-                className="h-24 mx-auto mb-8 opacity-90"
+                className="h-24 mx-auto mb-8"
               />
             </div>
-            <div className="space-y-6 backdrop-blur-sm bg-white/30 p-8 rounded-2xl">
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-800">
+            <div className="space-y-6 backdrop-blur-sm bg-black/30 p-8 rounded-2xl">
+              <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white">
                 Turn Moments Into Legacy
               </h1>
-              <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
                 You carry a lifetime of treasured moments—no need to be a seasoned storyteller to bring them to life. 
                 Memory Stitcher uses advanced AI to transform your recollections into beautiful, engaging narratives 
                 that your family will cherish for generations.
               </p>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              <p className="text-xl text-white/80 max-w-2xl mx-auto">
                 Because your wisdom is precious, and we're here to help you share it with the people who matter most.
               </p>
             </div>
             
             <div className="flex flex-col items-center gap-4 pt-4">
-              <h2 className="text-2xl font-semibold text-gray-800">
+              <h2 className="text-2xl font-semibold text-white">
                 Tell Your Story Well
               </h2>
               {user ? (
