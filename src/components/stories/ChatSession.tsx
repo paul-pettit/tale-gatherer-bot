@@ -20,35 +20,45 @@ interface ChatSessionProps {
 }
 
 export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessionProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: `Let's talk about this: ${question}` }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
+    // Initialize messages with the question
+    setMessages([{ role: 'assistant', content: `Let's talk about this: ${question}` }]);
+  }, [question]);
+
+  useEffect(() => {
     // Load existing messages when component mounts
     const loadMessages = async () => {
       if (!sessionId) return;
 
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('session_id', sessionId)
-        .order('created_at', { ascending: true });
+      try {
+        const { data, error } = await supabase
+          .from('chat_messages')
+          .select('*')
+          .eq('session_id', sessionId)
+          .order('created_at', { ascending: true });
 
-      if (error) {
+        if (error) throw error;
+
+        if (data) {
+          const existingMessages = data.map(msg => ({
+            role: msg.role as 'user' | 'assistant',
+            content: msg.content
+          }));
+          
+          // Only set existing messages if there are any to prevent overwriting the initial question
+          if (existingMessages.length > 0) {
+            setMessages(existingMessages);
+          }
+        }
+      } catch (error) {
         console.error('Error loading messages:', error);
-        return;
-      }
-
-      if (data) {
-        setMessages(data.map(msg => ({
-          role: msg.role as 'user' | 'assistant',
-          content: msg.content
-        })));
+        toast.error('Failed to load chat history');
       }
     };
 
@@ -66,13 +76,24 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
 
     try {
       // Save user message
-      await supabase
+      const { error: saveError } = await supabase
         .from('chat_messages')
-        .insert([{
+        .insert({
           session_id: sessionId,
           role: 'user',
           content: newMessage
-        }]);
+        });
+
+      if (saveError) throw saveError;
+
+      // Get story ID from the chat session
+      const { data: sessionData, error: sessionError } = await supabase
+        .from('chat_sessions')
+        .select('story_id')
+        .eq('id', sessionId)
+        .single();
+
+      if (sessionError) throw sessionError;
 
       // Get AI response
       const response = await fetch('/api/interview', {
@@ -83,24 +104,30 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
         body: JSON.stringify({
           prompt: newMessage,
           context: question,
-          messages: messages
+          messages: messages,
+          userId: user.id,
+          storyId: sessionData.story_id
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to get response');
+      if (!response.ok) {
+        throw new Error(`Failed to get response: ${response.statusText}`);
+      }
       
       const { answer } = await response.json();
-      const assistantMessage = { role: 'assistant' as const, content: answer };
       
       // Save assistant message
-      await supabase
+      const { error: assistantError } = await supabase
         .from('chat_messages')
-        .insert([{
+        .insert({
           session_id: sessionId,
           role: 'assistant',
           content: answer
-        }]);
+        });
 
+      if (assistantError) throw assistantError;
+
+      const assistantMessage = { role: 'assistant' as const, content: answer };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error in chat:', error);
@@ -111,8 +138,22 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
   };
 
   const handleFinish = async () => {
+    if (messages.length < 4) {
+      toast.error('Please have a longer conversation before finishing');
+      return;
+    }
+
     setIsFinishing(true);
     try {
+      // Get story ID from the chat session
+      const { data: sessionData, error: sessionError } = await supabase
+        .from('chat_sessions')
+        .select('story_id')
+        .eq('id', sessionId)
+        .single();
+
+      if (sessionError) throw sessionError;
+
       // Get AI to summarize the conversation into a coherent story
       const response = await fetch('/api/interview', {
         method: 'POST',
@@ -122,7 +163,9 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
         body: JSON.stringify({
           prompt: "Please help me craft a coherent story from our conversation. Incorporate the details, emotions, and reflections we've discussed into a well-structured narrative.",
           context: question,
-          messages: messages
+          messages: messages,
+          userId: user?.id,
+          storyId: sessionData.story_id
         }),
       });
 
