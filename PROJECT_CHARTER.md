@@ -59,15 +59,18 @@ MemoryStitch is an AI-powered biographical storytelling platform that conducts t
 - [x] User authentication with email/password
 - [x] Profile creation with basic info
 - [x] Family creation and management
-  - [x] Personal family creation
-  - [x] Family member management with roles
-  - [ ] Family invitation system
-- [ ] Story sharing within families
+  - [x] Automatic personal family creation for free tier
+  - [x] Family member management with roles (paid tiers only)
+  - [ ] Family invitation system (paid tiers only)
+  - [x] Family sharing as paid upgrade feature
+- [ ] Story sharing within families (paid tiers only)
 
 ### Free Tier Management
 - [x] Story limits tracking
 - [ ] Interview session limits
 - [ ] Story revision limits
+- [x] Single-user personal family
+- [x] Upgrade path to family sharing
 
 ## Technical Stack
 - [x] Frontend: React with TypeScript
@@ -87,6 +90,7 @@ MemoryStitch is an AI-powered biographical storytelling platform that conducts t
 - [x] Family creation
 - [x] Basic profile management
 - [x] Initial story creation
+- [x] Free tier personal family
 
 ### Phase 2 (Current Priority)
 - [ ] AI Interview System
@@ -99,7 +103,7 @@ MemoryStitch is an AI-powered biographical storytelling platform that conducts t
   - [ ] Version control
 
 ### Phase 3 (Upcoming)
-- [ ] Family sharing features
+- [ ] Family sharing features (paid tiers)
 - [ ] Enhanced interview capabilities
 - [ ] Advanced story formatting
 - [ ] Collaborative storytelling
@@ -115,6 +119,7 @@ MemoryStitch is an AI-powered biographical storytelling platform that conducts t
 - 2024-03-XX: Added family creation and management
 - 2024-03-XX: Implemented story creation with family organization
 - 2024-03-XX: Added RLS policies for secure data access
+- 2024-03-XX: Implemented free tier personal family and upgrade path
 
 ## Security & Data Protection
 - [x] Row Level Security (RLS) policies
@@ -123,3 +128,24 @@ MemoryStitch is an AI-powered biographical storytelling platform that conducts t
 - [ ] Data encryption at rest
 - [ ] Regular security audits
 - [ ] GDPR compliance measures
+
+## Subscription Tiers
+
+### Free Tier
+- Single-user personal family automatically created
+- Limited to 5 stories per month
+- Basic story features
+- Clear upgrade path to family sharing
+
+### Basic Family Plan
+- Up to 8 family members
+- Family story sharing
+- Collaborative writing
+- All core features
+
+### Premium Family Plan
+- Up to 20 family members
+- Priority support
+- All core features
+- Advanced analytics
+- Priority AI processing
