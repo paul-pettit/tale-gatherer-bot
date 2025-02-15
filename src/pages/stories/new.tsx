@@ -27,90 +27,68 @@ export default function NewStoryPage() {
   const [personalFamilyId, setPersonalFamilyId] = useState<string | null>(null);
 
   useEffect(() => {
-    const getOrCreatePersonalFamily = async () => {
+    const initializePage = async () => {
       if (!user) return;
 
       try {
         // First, try to find existing personal family
-        let { data: families, error: fetchError } = await supabase
+        const { data: families, error: fetchError } = await supabase
           .from('families')
-          .select('id, name')
+          .select('id')
           .eq('created_by', user.id)
           .limit(1);
 
-        if (fetchError) {
-          console.error('Error fetching families:', fetchError);
-          throw fetchError;
-        }
+        if (fetchError) throw fetchError;
 
-        if (families && families.length > 0) {
-          console.log('Found existing personal family:', families[0]);
-          setPersonalFamilyId(families[0].id);
-          return families[0].id;
-        }
-
-        // Create new personal family
-        const { data: newFamily, error: createError } = await supabase
-          .from('families')
-          .insert({
-            name: 'Personal Stories',
-            created_by: user.id,
-            subscription_tier: 'free'
-          })
-          .select('id')
-          .single();
-
-        if (createError) {
-          console.error('Error creating family:', createError);
-          throw createError;
-        }
-
-        console.log('Created new personal family:', newFamily);
-
-        // Add user as family member
-        const { error: memberError } = await supabase
-          .from('family_members')
-          .insert({
-            family_id: newFamily.id,
-            profile_id: user.id,
-            is_admin: true,
-            role: 'owner'
-          });
-
-        if (memberError) {
-          console.error('Error adding family member:', memberError);
-          throw memberError;
-        }
-
-        console.log('Added user as family member');
-        setPersonalFamilyId(newFamily.id);
-        return newFamily.id;
-      } catch (error: any) {
-        console.error('Detailed error in personal family setup:', error);
-        toast.error('Failed to set up personal space. Please try again.');
-        throw error;
-      }
-    };
-
-    const initializePage = async () => {
-      try {
-        // Get or create personal family first
-        const familyId = await getOrCreatePersonalFamily();
+        let familyId;
         
+        if (families && families.length > 0) {
+          familyId = families[0].id;
+        } else {
+          // Create new personal family
+          const { data: newFamily, error: createError } = await supabase
+            .from('families')
+            .insert({
+              name: 'Personal Stories',
+              created_by: user.id,
+              subscription_tier: 'free'
+            })
+            .select('id')
+            .single();
+
+          if (createError) throw createError;
+          
+          familyId = newFamily.id;
+
+          // Add user as family member
+          const { error: memberError } = await supabase
+            .from('family_members')
+            .insert({
+              family_id: familyId,
+              profile_id: user.id,
+              is_admin: true,
+              role: 'owner'
+            });
+
+          if (memberError) throw memberError;
+        }
+
+        setPersonalFamilyId(familyId);
+
         // Then fetch questions
-        const { data, error } = await supabase
+        const { data: questionsData, error: questionsError } = await supabase
           .from('question_prompts')
           .select('*')
           .limit(15);
 
-        if (error) throw error;
+        if (questionsError) throw questionsError;
 
         // Randomly select 3 questions
-        const shuffled = data.sort(() => 0.5 - Math.random());
+        const shuffled = questionsData.sort(() => 0.5 - Math.random());
         setQuestions(shuffled.slice(0, 3));
-      } catch (error) {
-        console.error('Error initializing page:', error);
-        toast.error('Failed to load questions');
+      } catch (error: any) {
+        console.error('Error in initialization:', error);
+        toast.error('Failed to initialize page. Please try again.');
       } finally {
         setIsLoading(false);
       }
