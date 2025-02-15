@@ -6,11 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
 export default function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [age, setAge] = useState('');
+  const [hometown, setHometown] = useState('');
+  const [gender, setGender] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
@@ -20,16 +25,26 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
-      const { error } = isSignUp 
-        ? await supabase.auth.signUp({ email, password })
-        : await supabase.auth.signInWithPassword({ email, password });
-
-      if (error) throw error;
-
       if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              first_name: firstName,
+              age: parseInt(age),
+              hometown,
+              gender,
+            },
+          },
+        });
+
+        if (error) throw error;
         toast.success('Registration successful! Please check your email to verify your account.');
         navigate('/subscription');
       } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
         toast.success('Welcome back!');
         navigate('/');
       }
@@ -75,6 +90,60 @@ export default function AuthPage() {
                 required
               />
             </div>
+            
+            {isSignUp && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    type="text"
+                    placeholder="Enter your first name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="age">Age</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    placeholder="Enter your age"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    required
+                    min="0"
+                    max="120"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="hometown">Hometown</Label>
+                  <Input
+                    id="hometown"
+                    type="text"
+                    placeholder="Enter your hometown"
+                    value={hometown}
+                    onChange={(e) => setHometown(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Gender</Label>
+                  <Select value={gender} onValueChange={setGender} required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="non-binary">Non-binary</SelectItem>
+                      <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button className="w-full" type="submit" disabled={isLoading}>

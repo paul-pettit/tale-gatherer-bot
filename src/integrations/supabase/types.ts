@@ -247,9 +247,13 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
           avatar_url: string | null
           created_at: string
+          first_name: string | null
           full_name: string | null
+          gender: string | null
+          hometown: string | null
           id: string
           is_free_tier: boolean | null
           last_payment_date: string | null
@@ -268,9 +272,13 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          age?: number | null
           avatar_url?: string | null
           created_at?: string
+          first_name?: string | null
           full_name?: string | null
+          gender?: string | null
+          hometown?: string | null
           id: string
           is_free_tier?: boolean | null
           last_payment_date?: string | null
@@ -289,9 +297,13 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          age?: number | null
           avatar_url?: string | null
           created_at?: string
+          first_name?: string | null
           full_name?: string | null
+          gender?: string | null
+          hometown?: string | null
           id?: string
           is_free_tier?: boolean | null
           last_payment_date?: string | null

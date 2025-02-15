@@ -22,11 +22,22 @@ serve(async (req) => {
 
     const { prompt, context, messages, userId, storyId } = await req.json();
 
-    // Create Supabase client to fetch system prompt
+    // Create Supabase client to fetch system prompt and user profile
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // Fetch user profile
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('first_name, age, hometown, gender')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      throw new Error('Failed to fetch user profile');
+    }
 
     // Fetch the interview system prompt
     const { data: systemPrompts, error: promptError } = await supabaseClient
@@ -47,8 +58,13 @@ serve(async (req) => {
     const openai = new OpenAIApi(configuration);
     const model = 'gpt-4';
 
-    // Replace ${context} in the system prompt with the actual context
-    const systemPrompt = systemPrompts.content.replace('${context}', context);
+    // Replace placeholders in the system prompt with actual values
+    const systemPrompt = systemPrompts.content
+      .replace('${context}', context)
+      .replace('${firstName}', profile.first_name || '')
+      .replace('${age}', profile.age?.toString() || '')
+      .replace('${hometown}', profile.hometown || '')
+      .replace('${gender}', profile.gender || '');
 
     const response = await openai.createChatCompletion({
       model,
