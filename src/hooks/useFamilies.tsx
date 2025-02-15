@@ -6,6 +6,7 @@ interface Family {
   id: string;
   name: string;
   created_at: string;
+  subscription_tier: 'free' | 'basic' | 'premium' | 'enterprise';
   _count?: {
     members: number;
   }
