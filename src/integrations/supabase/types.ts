@@ -16,7 +16,7 @@ export type Database = {
           id: string
           max_members: number
           name: string
-          subscription_tier: string
+          subscription_tier: Database["public"]["Enums"]["subscription_tier"]
           updated_at: string
         }
         Insert: {
@@ -25,7 +25,7 @@ export type Database = {
           id?: string
           max_members?: number
           name: string
-          subscription_tier?: string
+          subscription_tier?: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
         }
         Update: {
@@ -34,7 +34,7 @@ export type Database = {
           id?: string
           max_members?: number
           name?: string
-          subscription_tier?: string
+          subscription_tier?: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
         }
         Relationships: [
@@ -287,6 +287,7 @@ export type Database = {
         | "personal_achievements"
         | "historical_events"
       story_status: "draft" | "published" | "private"
+      subscription_tier: "free" | "basic" | "premium" | "enterprise"
     }
     CompositeTypes: {
       [_ in never]: never
