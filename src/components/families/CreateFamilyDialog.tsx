@@ -29,9 +29,18 @@ export function CreateFamilyDialog() {
 
     setIsLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
       const { error } = await supabase
         .from('families')
-        .insert([{ name: familyName.trim() }]);
+        .insert({
+          name: familyName.trim(),
+          created_by: user.id,
+        });
 
       if (error) throw error;
 
