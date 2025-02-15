@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -25,39 +26,55 @@ export default function NewStoryPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const initializePage = async () => {
-      if (!user) return;
+    if (!user) {
+      toast.error('You must be logged in to create a story');
+      navigate('/auth');
+      return;
+    }
 
+    const initializePage = async () => {
       try {
-        // Fetch questions from the questions table
+        console.log('Fetching questions...');
         const { data: questionsData, error: questionsError } = await supabase
           .from('questions')
           .select('*')
           .limit(15);
 
-        if (questionsError) throw questionsError;
+        if (questionsError) {
+          console.error('Error fetching questions:', questionsError);
+          throw questionsError;
+        }
 
+        if (!questionsData) {
+          throw new Error('No questions data received');
+        }
+
+        console.log('Questions fetched:', questionsData.length);
+        
         // Randomly select 3 questions
         const shuffled = questionsData.sort(() => 0.5 - Math.random());
         setQuestions(shuffled.slice(0, 3));
       } catch (error: any) {
         console.error('Error in initialization:', error);
-        toast.error('Failed to initialize page. Please try again.');
+        toast.error('Failed to initialize page: ' + error.message);
       } finally {
         setIsLoading(false);
       }
     };
 
     initializePage();
-  }, [user]);
+  }, [user, navigate]);
 
   const handleQuestionSelect = async (question: Question) => {
     if (!user) {
       toast.error('You must be logged in to create a story');
+      navigate('/auth');
       return;
     }
 
     try {
+      console.log('Creating story for question:', question.id);
+      
       // Create a new story draft
       const { data: storyData, error: storyError } = await supabase
         .from('stories')
@@ -71,7 +88,16 @@ export default function NewStoryPage() {
         .select()
         .single();
 
-      if (storyError) throw storyError;
+      if (storyError) {
+        console.error('Error creating story:', storyError);
+        throw storyError;
+      }
+
+      if (!storyData) {
+        throw new Error('No story data received after creation');
+      }
+
+      console.log('Story created:', storyData.id);
 
       // Create a chat session
       const { data: sessionData, error: sessionError } = await supabase
@@ -84,20 +110,52 @@ export default function NewStoryPage() {
         .select()
         .single();
 
-      if (sessionError) throw sessionError;
+      if (sessionError) {
+        console.error('Error creating chat session:', sessionError);
+        throw sessionError;
+      }
+
+      if (!sessionData) {
+        throw new Error('No session data received after creation');
+      }
+
+      console.log('Chat session created:', sessionData.id);
 
       setSelectedQuestion(question);
       setChatSessionId(sessionData.id);
-    } catch (error) {
-      console.error('Error creating story:', error);
-      toast.error('Failed to create story');
+      
+      // Decrement story token after successful creation
+      decrementStoryToken();
+      
+    } catch (error: any) {
+      console.error('Error in story creation flow:', error);
+      toast.error('Failed to create story: ' + error.message);
     }
   };
 
   const handleStoryComplete = async (content: string) => {
-    // Implementation for story completion will go here
-    toast.success('Story saved successfully!');
-    navigate('/');
+    try {
+      if (!user) throw new Error('User not authenticated');
+      
+      // Update the story with the completed content
+      const { error: updateError } = await supabase
+        .from('stories')
+        .update({ 
+          content,
+          status: 'published'
+        })
+        .eq('author_id', user.id)
+        .eq('status', 'draft')
+        .single();
+
+      if (updateError) throw updateError;
+
+      toast.success('Story saved successfully!');
+      navigate('/');
+    } catch (error: any) {
+      console.error('Error completing story:', error);
+      toast.error('Failed to save story: ' + error.message);
+    }
   };
 
   if (isLoading) {
