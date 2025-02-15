@@ -19,6 +19,7 @@ interface Profile {
   id: string;
   email: string;
   full_name: string | null;
+  first_name: string | null;
   subscription_plan: string | null;
   created_at: string;
 }
@@ -47,7 +48,7 @@ export function UsersTable({ profiles }: UsersTableProps) {
           <TableBody>
             {profiles.map((profile) => (
               <TableRow key={profile.id}>
-                <TableCell>{profile.full_name || 'N/A'}</TableCell>
+                <TableCell>{profile.first_name || profile.full_name || 'N/A'}</TableCell>
                 <TableCell>{profile.email}</TableCell>
                 <TableCell>{profile.subscription_plan || 'Free'}</TableCell>
                 <TableCell>{new Date(profile.created_at).toLocaleDateString()}</TableCell>
