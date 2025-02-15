@@ -2,24 +2,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, BookOpen, DollarSign, Shield } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { UsersTable } from "@/components/admin/UsersTable";
+import { StoriesTable } from "@/components/admin/StoriesTable";
+import { PaymentsTable } from "@/components/admin/PaymentsTable";
 
 interface Profile {
   id: string;
@@ -101,7 +89,6 @@ export default function AdminPage() {
       ]);
 
       if (profilesResult.data) {
-        // We need to fetch user emails separately since we can't join with auth.users
         const profilesWithEmail = await Promise.all(
           profilesResult.data.map(async (profile) => {
             const { data: userData } = await supabase.auth.admin.getUserById(profile.id);
@@ -160,96 +147,15 @@ export default function AdminPage() {
         </TabsList>
 
         <TabsContent value="users">
-          <Card>
-            <CardHeader>
-              <CardTitle>Users</CardTitle>
-              <CardDescription>Overview of all registered users</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Subscription</TableHead>
-                    <TableHead>Joined</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {profiles.map((profile) => (
-                    <TableRow key={profile.id}>
-                      <TableCell>{profile.full_name || 'N/A'}</TableCell>
-                      <TableCell>{profile.email}</TableCell>
-                      <TableCell>{profile.subscription_plan || 'Free'}</TableCell>
-                      <TableCell>{new Date(profile.created_at).toLocaleDateString()}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <UsersTable profiles={profiles} />
         </TabsContent>
 
         <TabsContent value="stories">
-          <Card>
-            <CardHeader>
-              <CardTitle>Stories</CardTitle>
-              <CardDescription>All stories in the platform</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Author ID</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {stories.map((story) => (
-                    <TableRow key={story.id}>
-                      <TableCell>{story.title}</TableCell>
-                      <TableCell>{story.author_id}</TableCell>
-                      <TableCell>{story.status}</TableCell>
-                      <TableCell>{new Date(story.created_at).toLocaleDateString()}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <StoriesTable stories={stories} />
         </TabsContent>
 
         <TabsContent value="payments">
-          <Card>
-            <CardHeader>
-              <CardTitle>Payments</CardTitle>
-              <CardDescription>All payment transactions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User ID</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {payments.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell>{payment.profile_id}</TableCell>
-                      <TableCell>${payment.amount}</TableCell>
-                      <TableCell>{payment.status}</TableCell>
-                      <TableCell>{new Date(payment.created_at).toLocaleDateString()}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <PaymentsTable payments={payments} />
         </TabsContent>
       </Tabs>
     </div>
