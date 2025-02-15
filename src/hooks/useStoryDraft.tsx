@@ -13,16 +13,20 @@ export function useStoryDraft(userId: string | undefined) {
       if (!userId) return;
 
       try {
-        // Get or create personal family
-        let { data: families } = await supabase
+        // First check if user already has a personal family
+        const { data: families, error: familiesError } = await supabase
           .from('families')
           .select('id')
           .eq('created_by', userId)
-          .limit(1);
+          .eq('name', 'Personal Stories')
+          .maybeSingle();
+
+        if (familiesError) throw familiesError;
 
         let familyId;
 
-        if (!families || families.length === 0) {
+        if (!families) {
+          // Create a new personal family if none exists
           const { data: newFamily, error: familyError } = await supabase
             .from('families')
             .insert({
@@ -36,7 +40,8 @@ export function useStoryDraft(userId: string | undefined) {
           if (familyError) throw familyError;
           familyId = newFamily.id;
 
-          await supabase
+          // Add user as family member and owner
+          const { error: memberError } = await supabase
             .from('family_members')
             .insert({
               family_id: familyId,
@@ -44,12 +49,14 @@ export function useStoryDraft(userId: string | undefined) {
               is_admin: true,
               role: 'owner'
             });
+
+          if (memberError) throw memberError;
         } else {
-          familyId = families[0].id;
+          familyId = families.id;
         }
 
         // Create initial draft
-        const { data: draft, error } = await supabase
+        const { data: draft, error: draftError } = await supabase
           .from('stories')
           .insert({
             title: '',
@@ -61,11 +68,11 @@ export function useStoryDraft(userId: string | undefined) {
           .select('id')
           .single();
 
-        if (error) throw error;
+        if (draftError) throw draftError;
         setDraftId(draft.id);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error creating initial draft:', error);
-        toast.error('Failed to initialize draft');
+        toast.error('Failed to initialize draft: ' + error.message);
       }
     };
 
@@ -79,7 +86,8 @@ export function useStoryDraft(userId: string | undefined) {
       const { error } = await supabase
         .from('stories')
         .update({ title, content })
-        .eq('id', draftId);
+        .eq('id', draftId)
+        .eq('author_id', userId); // Add author check for RLS
 
       if (error) throw error;
       setLastSaved(new Date());
