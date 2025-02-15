@@ -6,13 +6,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { remainingStories, isFreeTier } = useFreeTier();
 
   const { data: profile } = useQuery({
@@ -33,15 +29,6 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
-      <Button
-        variant="ghost"
-        className="mb-6"
-        onClick={() => navigate(-1)}
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back
-      </Button>
-
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Profile</CardTitle>

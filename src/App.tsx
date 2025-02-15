@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { StoryGuard } from "@/components/StoryGuard";
+import AppLayout from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import AuthPage from "./pages/auth";
 import SubscriptionPage from "./pages/subscription";
@@ -26,22 +27,31 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/subscription" element={<SubscriptionPage />} />
             <Route path="/subscription/success" element={<SubscriptionSuccess />} />
-            <Route path="/families" element={<FamiliesPage />} />
-            <Route path="/families/:id" element={<FamilyDetailsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route 
-              path="/stories/new" 
+            <Route
+              path="*"
               element={
-                <StoryGuard>
-                  <NewStoryPage />
-                </StoryGuard>
-              } 
+                <AppLayout>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/families" element={<FamiliesPage />} />
+                    <Route path="/families/:id" element={<FamilyDetailsPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route
+                      path="/stories/new"
+                      element={
+                        <StoryGuard>
+                          <NewStoryPage />
+                        </StoryGuard>
+                      }
+                    />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AppLayout>
+              }
             />
-            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
