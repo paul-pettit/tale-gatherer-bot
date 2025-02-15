@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,30 +29,33 @@ export default function AuthPage() {
         const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            data: {
-              first_name: firstName,
-              age: parseInt(age),
-              hometown,
-              gender,
-            },
-          },
         });
 
         if (signUpError) throw signUpError;
 
         if (authData.user) {
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update({
-              first_name: firstName,
-              age: parseInt(age),
-              hometown,
-              gender,
-            })
-            .eq('id', authData.user.id);
+          // Get field IDs
+          const { data: fields } = await supabase
+            .from('profile_fields')
+            .select('id, name')
+            .in('name', ['first_name', 'age', 'hometown', 'gender']);
 
-          if (updateError) throw updateError;
+          if (fields) {
+            const fieldValues = fields.map(field => ({
+              profile_id: authData.user!.id,
+              field_id: field.id,
+              value: field.name === 'first_name' ? firstName :
+                     field.name === 'age' ? age :
+                     field.name === 'hometown' ? hometown :
+                     field.name === 'gender' ? gender : null
+            }));
+
+            const { error: insertError } = await supabase
+              .from('profile_field_values')
+              .insert(fieldValues);
+
+            if (insertError) throw insertError;
+          }
         }
 
         toast.success('Registration successful! Please check your email to verify your account.');
@@ -149,10 +153,10 @@ export default function AuthPage() {
                       <SelectValue placeholder="Select your gender" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="non-binary">Non-binary</SelectItem>
-                      <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Non-binary">Non-binary</SelectItem>
+                      <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

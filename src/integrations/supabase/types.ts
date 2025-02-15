@@ -245,6 +245,87 @@ export type Database = {
           },
         ]
       }
+      profile_field_values: {
+        Row: {
+          created_at: string
+          field_id: string | null
+          id: string
+          profile_id: string | null
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string
+          field_id?: string | null
+          id?: string
+          profile_id?: string | null
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string
+          field_id?: string | null
+          id?: string
+          profile_id?: string | null
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_field_values_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "profile_fields"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_field_values_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_fields: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          display_order: number | null
+          id: string
+          label: string
+          name: string
+          options: Json | null
+          required: boolean | null
+          type: Database["public"]["Enums"]["profile_field_type"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          label: string
+          name: string
+          options?: Json | null
+          required?: boolean | null
+          type: Database["public"]["Enums"]["profile_field_type"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          label?: string
+          name?: string
+          options?: Json | null
+          required?: boolean | null
+          type?: Database["public"]["Enums"]["profile_field_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
@@ -662,10 +743,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      migrate_profile_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
       llm_model: "gpt-4o-mini" | "gpt-4o"
+      profile_field_type: "text" | "number" | "select"
       prompt_type: "interview" | "story_generation"
       question_category:
         | "childhood_memories"
