@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,7 +25,7 @@ export default function AuthPage() {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -39,7 +38,22 @@ export default function AuthPage() {
           },
         });
 
-        if (error) throw error;
+        if (signUpError) throw signUpError;
+
+        if (authData.user) {
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              first_name: firstName,
+              age: parseInt(age),
+              hometown,
+              gender,
+            })
+            .eq('id', authData.user.id);
+
+          if (updateError) throw updateError;
+        }
+
         toast.success('Registration successful! Please check your email to verify your account.');
         navigate('/subscription');
       } else {
