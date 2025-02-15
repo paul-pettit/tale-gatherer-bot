@@ -593,6 +593,30 @@ export type Database = {
         }
         Relationships: []
       }
+      system_prompts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          type: Database["public"]["Enums"]["prompt_type"]
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          type: Database["public"]["Enums"]["prompt_type"]
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          type?: Database["public"]["Enums"]["prompt_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -630,6 +654,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user"
       llm_model: "gpt-4o-mini" | "gpt-4o"
+      prompt_type: "interview" | "story_generation"
       question_category:
         | "childhood_memories"
         | "life_lessons"

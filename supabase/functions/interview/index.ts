@@ -22,27 +22,38 @@ serve(async (req) => {
 
     const { prompt, context, messages, userId, storyId } = await req.json();
 
+    // Create Supabase client to fetch system prompt
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Fetch the interview system prompt
+    const { data: systemPrompts, error: promptError } = await supabaseClient
+      .from('system_prompts')
+      .select('content')
+      .eq('type', 'interview')
+      .limit(1)
+      .single();
+
+    if (promptError) {
+      throw new Error('Failed to fetch system prompt');
+    }
+
     const configuration = new Configuration({
       apiKey: openAiKey,
     });
 
     const openai = new OpenAIApi(configuration);
-    const model = 'gpt-4'; // Fixed model name
+    const model = 'gpt-4';
+
+    // Replace ${context} in the system prompt with the actual context
+    const systemPrompt = systemPrompts.content.replace('${context}', context);
 
     const response = await openai.createChatCompletion({
       model,
       messages: [
-        { role: 'system', content: `You are a compassionate and skilled interviewer helping someone write their life story. 
-          You are currently discussing: "${context}"
-          Your goal is to:
-          1. Ask thoughtful follow-up questions
-          2. Show genuine interest in their experiences
-          3. Help them recall specific details and emotions
-          4. Keep responses focused but encouraging
-          5. Guide them toward meaningful reflections
-          6. If they mention a location, ask about specific details of that place
-          7. If they mention a person, ask about their relationship with that person
-          8. If they mention an event, ask about how it made them feel` },
+        { role: 'system', content: systemPrompt },
         ...messages,
         { role: 'user', content: prompt }
       ],
@@ -53,17 +64,12 @@ serve(async (req) => {
     const answer = response.data.choices[0]?.message?.content || 'I apologize, but I am unable to continue the conversation at this moment.';
     
     // Calculate approximate token usage and cost
-    const promptTokens = JSON.stringify(messages).length / 4; // Rough approximation
-    const responseTokens = answer.length / 4; // Rough approximation
+    const promptTokens = JSON.stringify(messages).length / 4;
+    const responseTokens = answer.length / 4;
     const totalTokens = Math.ceil(promptTokens + responseTokens);
-    const costUsd = totalTokens * 0.00001; // Approximate cost per token
+    const costUsd = totalTokens * 0.00001;
 
     // Log the prompt usage
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
     await supabaseClient
       .from('prompt_logs')
       .insert({

@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, BookOpen, DollarSign, Shield, Terminal } from "lucide-react";
+import { Users, BookOpen, DollarSign, Shield, Terminal, Bot } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { UsersTable } from "@/components/admin/UsersTable";
 import { StoriesTable } from "@/components/admin/StoriesTable";
 import { PaymentsTable } from "@/components/admin/PaymentsTable";
 import { PromptLogsTable } from "@/components/admin/PromptLogsTable";
+import { SystemPromptsTable } from "@/components/admin/SystemPromptsTable";
 
 interface Profile {
   id: string;
@@ -45,6 +46,14 @@ interface PromptLog {
   status: string;
 }
 
+interface SystemPrompt {
+  id: string;
+  type: 'interview' | 'story_generation';
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function AdminPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -52,6 +61,7 @@ export default function AdminPage() {
   const [stories, setStories] = useState<Story[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [promptLogs, setPromptLogs] = useState<PromptLog[]>([]);
+  const [systemPrompts, setSystemPrompts] = useState<SystemPrompt[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -86,7 +96,7 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     try {
-      const [profilesResult, storiesResult, paymentsResult, promptLogsResult] = await Promise.all([
+      const [profilesResult, storiesResult, paymentsResult, promptLogsResult, systemPromptsResult] = await Promise.all([
         supabase
           .from('profiles')
           .select('id, full_name, subscription_plan, created_at')
@@ -103,6 +113,10 @@ export default function AdminPage() {
           .from('prompt_logs')
           .select('*')
           .order('created_at', { ascending: false }),
+        supabase
+          .from('system_prompts')
+          .select('*')
+          .order('type', { ascending: true }),
       ]);
 
       if (profilesResult.data) {
@@ -120,6 +134,7 @@ export default function AdminPage() {
       if (storiesResult.data) setStories(storiesResult.data);
       if (paymentsResult.data) setPayments(paymentsResult.data);
       if (promptLogsResult.data) setPromptLogs(promptLogsResult.data);
+      if (systemPromptsResult.data) setSystemPrompts(systemPromptsResult.data);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -166,6 +181,10 @@ export default function AdminPage() {
             <Terminal className="w-4 h-4 mr-2" />
             Prompts
           </TabsTrigger>
+          <TabsTrigger value="ai" className="flex items-center">
+            <Bot className="w-4 h-4 mr-2" />
+            AI Settings
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
@@ -182,6 +201,10 @@ export default function AdminPage() {
 
         <TabsContent value="prompts">
           <PromptLogsTable logs={promptLogs} />
+        </TabsContent>
+
+        <TabsContent value="ai">
+          <SystemPromptsTable prompts={systemPrompts} />
         </TabsContent>
       </Tabs>
     </div>
