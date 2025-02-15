@@ -31,21 +31,21 @@ export default function NewStoryPage() {
       if (!user) return;
 
       try {
-        // First, try to find existing personal family
-        const { data: families, error: fetchError } = await supabase
+        // First, fetch or create personal family
+        const { data: families, error: familyError } = await supabase
           .from('families')
           .select('id')
           .eq('created_by', user.id)
-          .limit(1);
+          .limit(1)
+          .maybeSingle();
 
-        if (fetchError) throw fetchError;
+        if (familyError) throw familyError;
 
         let familyId;
-        
-        if (families && families.length > 0) {
-          familyId = families[0].id;
+        if (families) {
+          familyId = families.id;
         } else {
-          // Create new personal family
+          // Create new personal family and add user as member
           const { data: newFamily, error: createError } = await supabase
             .from('families')
             .insert({
@@ -60,7 +60,6 @@ export default function NewStoryPage() {
           
           familyId = newFamily.id;
 
-          // Add user as family member
           const { error: memberError } = await supabase
             .from('family_members')
             .insert({
@@ -75,7 +74,7 @@ export default function NewStoryPage() {
 
         setPersonalFamilyId(familyId);
 
-        // Then fetch questions
+        // Fetch questions
         const { data: questionsData, error: questionsError } = await supabase
           .from('question_prompts')
           .select('*')
