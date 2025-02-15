@@ -52,8 +52,42 @@ export default function NewStoryPage() {
 
         if (familyError) throw familyError;
         familyId = newFamily.id;
+        
+        // Add user as a member of their new family
+        const { error: memberError } = await supabase
+          .from('family_members')
+          .insert({
+            family_id: familyId,
+            profile_id: user.id,
+            is_admin: true,
+            role: 'owner'
+          });
+
+        if (memberError) throw memberError;
       } else {
         familyId = families[0].id;
+        
+        // Check if user is already a member of the family
+        const { data: existingMember } = await supabase
+          .from('family_members')
+          .select('id')
+          .eq('family_id', familyId)
+          .eq('profile_id', user.id)
+          .single();
+
+        // If not a member yet, add them
+        if (!existingMember) {
+          const { error: memberError } = await supabase
+            .from('family_members')
+            .insert({
+              family_id: familyId,
+              profile_id: user.id,
+              is_admin: true,
+              role: 'owner'
+            });
+
+          if (memberError) throw memberError;
+        }
       }
       
       const { error } = await supabase
