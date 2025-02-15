@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import FamiliesPage from "./pages/families";
 import FamilyDetailsPage from "./pages/families/[id]";
 import NewStoryPage from "./pages/stories/new";
+import ProfilePage from "./pages/profile";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/subscription/success" element={<SubscriptionSuccess />} />
             <Route path="/families" element={<FamiliesPage />} />
             <Route path="/families/:id" element={<FamilyDetailsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             <Route 
               path="/stories/new" 
               element={
