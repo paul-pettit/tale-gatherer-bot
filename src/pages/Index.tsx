@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -124,110 +123,37 @@ export default function Index() {
       {/* Family Plans Section */}
       <div className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Choose Your Family Plan
-          </h2>
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Free Tier */}
-              <div className="bg-white rounded-lg p-8 shadow-sm">
-                <h3 className="text-2xl font-semibold mb-4">Free Tier</h3>
-                <div className="text-3xl font-bold mb-6">$0<span className="text-lg font-normal text-gray-600">/month</span></div>
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    5 personal stories
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    Basic editor
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    Private storage
-                  </li>
-                </ul>
-                <Button
-                  size="lg"
-                  onClick={() => navigate("/auth")}
-                  className="w-full"
-                >
-                  Start Free
-                </Button>
-              </div>
-
-              {/* Standard Family Plan */}
-              <div className="bg-white rounded-lg p-8 shadow-sm border-2 border-primary">
-                <div className="inline-block bg-primary text-white px-3 py-1 rounded-full text-sm mb-4">
-                  Most Popular
-                </div>
-                <h3 className="text-2xl font-semibold mb-4">Standard Family</h3>
-                <div className="text-3xl font-bold mb-6">$20<span className="text-lg font-normal text-gray-600">/month</span></div>
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    Up to 8 family members
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    Unlimited stories
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    Story incentives
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    Version control
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    $3/month per extra member
-                  </li>
-                </ul>
-                <Button
-                  size="lg"
-                  onClick={() => navigate("/auth")}
-                  className="w-full"
-                >
-                  Choose Standard
-                </Button>
-              </div>
-
-              {/* Extended Family Plan */}
-              <div className="bg-white rounded-lg p-8 shadow-sm">
-                <h3 className="text-2xl font-semibold mb-4">Extended Family</h3>
-                <div className="text-3xl font-bold mb-6">$35<span className="text-lg font-normal text-gray-600">/month</span></div>
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    Up to 20 family members
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    All Standard features
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    Priority support
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    Advanced collaboration
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    $3/month per extra member
-                  </li>
-                </ul>
-                <Button
-                  size="lg"
-                  onClick={() => navigate("/auth")}
-                  className="w-full"
-                >
-                  Choose Extended
-                </Button>
-              </div>
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Family Plans Coming Soon
+            </h2>
+            <p className="text-xl text-gray-600 mb-8">
+              Start preserving your memories today with our free tier. Family sharing and collaborative features are coming soon!
+            </p>
+            <div className="bg-white rounded-lg p-8 shadow-sm">
+              <h3 className="text-2xl font-semibold mb-4">Free Tier</h3>
+              <div className="text-3xl font-bold mb-6">$0<span className="text-lg font-normal text-gray-600">/month</span></div>
+              <ul className="space-y-3 mb-6">
+                <li className="flex items-center justify-center">
+                  <span className="mr-2">✓</span>
+                  5 personal stories
+                </li>
+                <li className="flex items-center justify-center">
+                  <span className="mr-2">✓</span>
+                  Basic editor
+                </li>
+                <li className="flex items-center justify-center">
+                  <span className="mr-2">✓</span>
+                  Private storage
+                </li>
+              </ul>
+              <Button
+                size="lg"
+                onClick={() => navigate("/auth")}
+                className="w-full"
+              >
+                Start Free
+              </Button>
             </div>
           </div>
         </div>
