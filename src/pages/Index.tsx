@@ -15,6 +15,13 @@ export default function Index() {
         <div className="absolute inset-0 bg-gradient-to-r from-violet-100 to-fuchsia-100 opacity-30" />
         <div className="container mx-auto px-4 py-24">
           <div className="text-center space-y-8 relative animate-fade-in">
+            <div className="mb-8">
+              <img 
+                src="/lovable-uploads/ff964a7f-566d-4e85-9216-ac611ea1bb51.png"
+                alt="MemoryStitcher"
+                className="h-24 mx-auto mb-8"
+              />
+            </div>
             <div className="space-y-4">
               <h1 className="text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
                 Preserve Your Family Stories
