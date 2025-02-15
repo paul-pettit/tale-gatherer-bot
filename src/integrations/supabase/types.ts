@@ -404,6 +404,78 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_code_redemptions: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+          promo_code_id: string
+          tokens_granted: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+          promo_code_id: string
+          tokens_granted: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+          promo_code_id?: string
+          tokens_granted?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_code_redemptions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_code_redemptions_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promo_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          max_uses: number | null
+          times_used: number | null
+          tokens_granted: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          times_used?: number | null
+          tokens_granted?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          times_used?: number | null
+          tokens_granted?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       prompt_logs: {
         Row: {
           cost_usd: number
@@ -739,6 +811,16 @@ export type Database = {
       migrate_profile_data: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      redeem_promo_code: {
+        Args: {
+          code_text: string
+        }
+        Returns: {
+          success: boolean
+          message: string
+          tokens_granted: number
+        }[]
       }
     }
     Enums: {
