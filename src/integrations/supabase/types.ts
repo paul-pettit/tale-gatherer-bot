@@ -504,7 +504,7 @@ export type Database = {
           author_id: string
           content: string
           created_at: string
-          family_id: string
+          family_id: string | null
           id: string
           last_auto_save: string | null
           question_id: string | null
@@ -517,7 +517,7 @@ export type Database = {
           author_id: string
           content: string
           created_at?: string
-          family_id: string
+          family_id?: string | null
           id?: string
           last_auto_save?: string | null
           question_id?: string | null
@@ -530,7 +530,7 @@ export type Database = {
           author_id?: string
           content?: string
           created_at?: string
-          family_id?: string
+          family_id?: string | null
           id?: string
           last_auto_save?: string | null
           question_id?: string | null
@@ -545,13 +545,6 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "stories_family_id_fkey"
-            columns: ["family_id"]
-            isOneToOne: false
-            referencedRelation: "families"
             referencedColumns: ["id"]
           },
           {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -24,65 +23,13 @@ export default function NewStoryPage() {
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [personalFamilyId, setPersonalFamilyId] = useState<string | null>(null);
 
   useEffect(() => {
     const initializePage = async () => {
       if (!user) return;
 
       try {
-        // First, ensure we have the user's profile
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (profileError) throw profileError;
-
-        // Then, fetch or create personal family
-        const { data: families, error: familyError } = await supabase
-          .from('families')
-          .select('id')
-          .eq('created_by', user.id)
-          .maybeSingle();
-
-        if (familyError) throw familyError;
-
-        let familyId;
-        if (!families) {
-          // Create new personal family
-          const { data: newFamily, error: createError } = await supabase
-            .from('families')
-            .insert({
-              name: 'Personal Stories',
-              created_by: user.id,
-              subscription_tier: 'free'
-            })
-            .select('id')
-            .single();
-
-          if (createError) throw createError;
-          familyId = newFamily.id;
-
-          // Add user as family member
-          const { error: memberError } = await supabase
-            .from('family_members')
-            .insert({
-              family_id: familyId,
-              profile_id: user.id,
-              is_admin: true,
-              role: 'owner'
-            });
-
-          if (memberError) throw memberError;
-        } else {
-          familyId = families.id;
-        }
-
-        setPersonalFamilyId(familyId);
-
-        // Fetch questions from the questions table instead of question_prompts
+        // Fetch questions from the questions table
         const { data: questionsData, error: questionsError } = await supabase
           .from('questions')
           .select('*')
@@ -110,11 +57,6 @@ export default function NewStoryPage() {
       return;
     }
 
-    if (!personalFamilyId) {
-      toast.error('Failed to create story: Personal space not set up');
-      return;
-    }
-
     try {
       // Create a new story draft
       const { data: storyData, error: storyError } = await supabase
@@ -123,7 +65,6 @@ export default function NewStoryPage() {
           title: `Story about ${question.category}`,
           content: '',
           author_id: user.id,
-          family_id: personalFamilyId,
           status: 'draft',
           question_id: question.id
         })
