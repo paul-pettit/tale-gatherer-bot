@@ -2,45 +2,46 @@
 # MemoryStitch Project Charter
 
 ## Project Overview
-MemoryStitch is a family storytelling platform that enables multiple generations to share and preserve their stories through an interactive, AI-enhanced experience.
+MemoryStitch is an AI-powered biographical storytelling platform that conducts thoughtful interviews to help users preserve their life stories in a meaningful and engaging way.
 
 ## Core Features
 
-### Authentication & Family Management
+### AI Interview System (Primary Focus)
+- [ ] Curated question bank with categories
+  - Childhood and Roots
+  - Family and Close Relationships
+  - First Love and Relationships
+  - High School and Early Years
+  - Career and Aspirations
+  - Risk, Adventures, and Growth
+  - Reflections and Legacy
+- [ ] Interactive AI interviewer
+  - Random initial question selection
+  - Dynamic follow-up questions
+  - Up to 15 questions per session
+  - Empathetic and professional tone
+- [ ] Story Generation
+  - Professional biographical narrative creation
+  - User review and modification system
+  - Privacy controls (private/shared)
+- [ ] Story Enhancement
+  - Style and tone adjustments
+  - Detail refinement
+  - Fact verification
+
+### Family Management (Supporting Features)
 - [x] User authentication with email/password
 - [x] Profile creation with basic info
 - [x] Family creation and management
   - [x] Personal family creation
   - [x] Family member management with roles
   - [ ] Family invitation system
-- [ ] Member invitations via Telegram (MVP)
-- [ ] Future: Email and SMS invitations
+- [ ] Story sharing within families
 
-### Story Management
-- [x] Basic story creation
-- [x] Draft status support
-- [x] Family-based story organization
-- [x] Free tier story limits
-- [ ] Auto-save functionality
-- [ ] Version control for stories
-- [ ] Publishing with irreversible status
-- [ ] Comments with real-time updates
-- [ ] Threaded conversations
-
-### AI Integration
-- [ ] OpenAI-powered interview system
-- [ ] Customizable model settings
-- [ ] Future: Support for alternative AI providers (DeepSeek, OpenRouter)
-
-### Subscription Tiers
-- Basic Family Plan ($20/month)
-  - Up to 8 members
-  - All core features
-- Extended Family Plan ($35/month)
-  - Up to 20 members
-  - Priority support
-  - All core features
-- Additional members: $3/month each
+### Free Tier Management
+- [x] Story limits tracking
+- [ ] Interview session limits
+- [ ] Story revision limits
 
 ## Technical Stack
 - [x] Frontend: React with TypeScript
@@ -48,7 +49,7 @@ MemoryStitch is a family storytelling platform that enables multiple generations
   - [x] Row Level Security (RLS) policies
   - [x] User authentication
   - [x] Database schema
-- [ ] AI: OpenAI API (with flexibility for alternatives)
+- [ ] AI: OpenAI API for interviewer
 - [x] Real-time: Supabase Realtime
 - [x] Database: PostgreSQL (via Supabase)
 
@@ -59,34 +60,28 @@ MemoryStitch is a family storytelling platform that enables multiple generations
 - [x] User authentication
 - [x] Family creation
 - [x] Basic profile management
-- [x] Story creation with family organization
+- [x] Initial story creation
 
-### Phase 2 (Current)
-- [ ] Story management enhancements
-  - [ ] Auto-save functionality
-  - [ ] Rich text editor
+### Phase 2 (Current Priority)
+- [ ] AI Interview System
+  - [ ] Question bank implementation
+  - [ ] AI interviewer integration
+  - [ ] Story generation and editing
+  - [ ] Privacy controls
+- [ ] Enhanced story management
   - [ ] Story preview
-- [ ] AI interviewer integration
-- [ ] Enhanced draft/publish workflow
+  - [ ] Version control
 
 ### Phase 3 (Upcoming)
-- [ ] Comments and real-time updates
-- [ ] Family member invitations
-- [ ] Version control
-- [ ] Story sharing capabilities
+- [ ] Family sharing features
+- [ ] Enhanced interview capabilities
+- [ ] Advanced story formatting
+- [ ] Collaborative storytelling
 
 ### Phase 4 (Future)
 - [ ] Subscription management
 - [ ] Enhanced AI features
 - [ ] Analytics and insights
-
-## Future Enhancements
-- Collaborative storytelling features
-- Additional AI model support
-- Enhanced media support
-- Mobile applications
-- Advanced analytics
-- Export/backup features
 
 ## Project Updates
 - 2024-03-XX: Initial project setup and database schema
@@ -96,10 +91,9 @@ MemoryStitch is a family storytelling platform that enables multiple generations
 - 2024-03-XX: Added RLS policies for secure data access
 
 ## Security & Data Protection
-- [x] Row Level Security (RLS) for all tables
+- [x] Row Level Security (RLS) policies
 - [x] Secure family member management
 - [x] Protected story access
 - [ ] Data encryption at rest
 - [ ] Regular security audits
 - [ ] GDPR compliance measures
-
