@@ -56,7 +56,7 @@ serve(async (req) => {
     });
 
     const openai = new OpenAIApi(configuration);
-    const model = 'gpt-4';
+    const model = 'gpt-4o-mini';
 
     // Replace placeholders in the system prompt with actual values
     const systemPrompt = systemPrompts.content
