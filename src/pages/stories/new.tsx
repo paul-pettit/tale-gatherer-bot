@@ -31,21 +31,27 @@ export default function NewStoryPage() {
       if (!user) return;
 
       try {
-        // First, fetch or create personal family
+        // First, ensure we have the user's profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        // Then, fetch or create personal family
         const { data: families, error: familyError } = await supabase
           .from('families')
           .select('id')
           .eq('created_by', user.id)
-          .limit(1)
           .maybeSingle();
 
         if (familyError) throw familyError;
 
         let familyId;
-        if (families) {
-          familyId = families.id;
-        } else {
-          // Create new personal family and add user as member
+        if (!families) {
+          // Create new personal family
           const { data: newFamily, error: createError } = await supabase
             .from('families')
             .insert({
@@ -57,9 +63,9 @@ export default function NewStoryPage() {
             .single();
 
           if (createError) throw createError;
-          
           familyId = newFamily.id;
 
+          // Add user as family member
           const { error: memberError } = await supabase
             .from('family_members')
             .insert({
@@ -70,6 +76,8 @@ export default function NewStoryPage() {
             });
 
           if (memberError) throw memberError;
+        } else {
+          familyId = families.id;
         }
 
         setPersonalFamilyId(familyId);
