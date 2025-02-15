@@ -36,7 +36,7 @@ export default function NewStoryPage() {
           .from('profiles')
           .select('id')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (profileError) throw profileError;
 
@@ -82,9 +82,9 @@ export default function NewStoryPage() {
 
         setPersonalFamilyId(familyId);
 
-        // Fetch questions
+        // Fetch questions from the questions table instead of question_prompts
         const { data: questionsData, error: questionsError } = await supabase
-          .from('question_prompts')
+          .from('questions')
           .select('*')
           .limit(15);
 
