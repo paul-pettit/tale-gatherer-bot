@@ -14,7 +14,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Home, Users, PenSquare, User, LogOut, Shield } from "lucide-react";
+import { Home, PenSquare, User, LogOut, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 
@@ -52,7 +52,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
-    { name: 'Families', href: '/families', icon: Users },
     { name: 'New Story', href: '/stories/new', icon: PenSquare },
     { name: 'Profile', href: '/profile', icon: User },
     ...(isAdmin ? [{ name: 'Admin', href: '/admin', icon: Shield }] : []),
