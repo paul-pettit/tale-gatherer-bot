@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { BookOpen, Users, Gift } from 'lucide-react';
+import { Sparkles, BookOpen, MessageSquareMore } from 'lucide-react';
 
 export default function Index() {
   const navigate = useNavigate();
@@ -24,15 +24,22 @@ export default function Index() {
             </div>
             <div className="space-y-4">
               <h1 className="text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
-                Preserve Your Family Stories
+                Turn Moments Into Legacy
               </h1>
               <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-                Every family has stories worth preserving. Make your memories last forever through
-                guided storytelling that brings generations together.
+                You carry a lifetime of treasured moments—no need to be a seasoned storyteller to bring them to life. 
+                Memory Stitcher uses advanced AI to transform your recollections into beautiful, engaging narratives 
+                that your family will cherish for generations.
+              </p>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Because your wisdom is precious, and we're here to help you share it with the people who matter most.
               </p>
             </div>
             
-            <div className="flex justify-center gap-4 pt-4">
+            <div className="flex flex-col items-center gap-4 pt-4">
+              <h2 className="text-2xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
+                Tell Your Story Well
+              </h2>
               {user ? (
                 <Button 
                   size="lg" 
@@ -47,7 +54,7 @@ export default function Index() {
                   onClick={() => navigate('/auth')}
                   className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-lg px-8 py-6 transform transition-all hover:scale-105"
                 >
-                  Start Your Family Story
+                  Get Early Access
                 </Button>
               )}
             </div>
@@ -61,14 +68,29 @@ export default function Index() {
           <div className="group">
             <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-purple-100">
               <div className="h-12 w-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Sparkles className="text-white h-6 w-6" />
+              </div>
+              <h3 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
+                AI-Powered Storytelling
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Transform simple memories into beautifully crafted narratives with our intelligent 
+                story generator. No writing experience needed!
+              </p>
+            </div>
+          </div>
+
+          <div className="group">
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-purple-100">
+              <div className="h-12 w-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <BookOpen className="text-white h-6 w-6" />
               </div>
               <h3 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
-                Guided Storytelling
+                Family Lore Library
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Our thoughtfully crafted questions help bring out the most meaningful memories and stories, 
-                making it easy to share your experiences.
+                Create a permanent digital archive of your family's most precious stories, 
+                accessible to generations to come.
               </p>
             </div>
           </div>
@@ -76,32 +98,30 @@ export default function Index() {
           <div className="group">
             <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-purple-100">
               <div className="h-12 w-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Users className="text-white h-6 w-6" />
+                <MessageSquareMore className="text-white h-6 w-6" />
               </div>
               <h3 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
-                Family Collaboration
+                Guided Story Collection
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Invite family members to contribute their unique perspectives and preserve memories 
-                together in one shared space.
+                Our smart prompts help uncover stories you never knew existed, 
+                making storytelling effortless and enjoyable.
               </p>
             </div>
           </div>
+        </div>
 
-          <div className="group">
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-purple-100">
-              <div className="h-12 w-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Gift className="text-white h-6 w-6" />
-              </div>
-              <h3 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 text-transparent bg-clip-text">
-                Story Incentives
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Encourage storytelling through our unique gift card system. Show appreciation 
-                for shared memories that touch your heart.
-              </p>
-            </div>
-          </div>
+        {/* Testimonial Section */}
+        <div className="mt-24 text-center">
+          <blockquote className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto italic">
+            "Memory Stitcher helped us discover stories from my grandparents that we never would have 
+            thought to ask about. It's like having a family historian in your pocket!"
+          </blockquote>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-24 text-center text-gray-600">
+          © 2025 Memory Stitcher. All rights reserved.
         </div>
       </div>
     </div>
