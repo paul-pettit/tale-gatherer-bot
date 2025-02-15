@@ -14,11 +14,11 @@ export default function Index() {
       {/* Navigation */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/50 to-transparent">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             <img 
-              src="https://memorystitcher.com/images/memorystitcher.png" 
+              src="/lovable-uploads/cf056b67-f5f3-4db7-ad3c-d5185770cb91.png" 
               alt="Memory Stitcher" 
-              className="h-8 brightness-110 contrast-125"
+              className="h-12 w-auto"
             />
             {!user && (
               <div className="space-x-4">
