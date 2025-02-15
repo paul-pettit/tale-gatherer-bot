@@ -13,6 +13,7 @@ import SubscriptionSuccess from "./pages/subscription/success";
 import NotFound from "./pages/NotFound";
 import FamiliesPage from "./pages/families";
 import FamilyDetailsPage from "./pages/families/[id]";
+import NewStoryPage from "./pages/stories/new";
 
 const queryClient = new QueryClient();
 
@@ -34,8 +35,7 @@ const App = () => (
               path="/stories/new" 
               element={
                 <StoryGuard>
-                  {/* Story creation component will go here */}
-                  <div>New Story Form (Coming Soon)</div>
+                  <NewStoryPage />
                 </StoryGuard>
               } 
             />
