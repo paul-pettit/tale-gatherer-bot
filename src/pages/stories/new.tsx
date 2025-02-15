@@ -28,6 +28,33 @@ export default function NewStoryPage() {
 
     try {
       setIsSubmitting(true);
+
+      // First, try to get the user's personal family
+      let { data: families } = await supabase
+        .from('families')
+        .select('id')
+        .eq('created_by', user.id)
+        .limit(1);
+
+      let familyId;
+
+      // If user doesn't have a family, create one
+      if (!families || families.length === 0) {
+        const { data: newFamily, error: familyError } = await supabase
+          .from('families')
+          .insert({
+            name: 'Personal Stories',
+            created_by: user.id,
+            subscription_tier: 'free'
+          })
+          .select('id')
+          .single();
+
+        if (familyError) throw familyError;
+        familyId = newFamily.id;
+      } else {
+        familyId = families[0].id;
+      }
       
       const { error } = await supabase
         .from('stories')
@@ -35,6 +62,7 @@ export default function NewStoryPage() {
           title,
           content,
           author_id: user.id,
+          family_id: familyId,
           status: 'draft',
         });
 
