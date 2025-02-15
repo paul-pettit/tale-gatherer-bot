@@ -12,7 +12,7 @@ export default function Index() {
     <div className="min-h-screen bg-gradient-to-b from-[#FEF9D7] to-white">
       {/* Hero Section with Background Image */}
       <div className="relative min-h-[80vh] flex items-center">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1506744038136-46273834b3fb')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1501854140801-50d01698950b')] bg-cover bg-center" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/40" />
         
         <div className="container mx-auto px-4 py-24 relative">
@@ -64,9 +64,45 @@ export default function Index() {
         </div>
       </div>
 
-      {/* Features Section with Organic Background */}
-      <div className="bg-gradient-to-b from-white to-[#E5DEFF]">
-        <div className="container mx-auto px-4 py-24">
+      {/* How It Works Section */}
+      <div className="bg-white py-24">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-16 text-gray-800">How Memory Stitcher Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-purple-600">1</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800">Share Your Stories</h3>
+              <p className="text-gray-600">
+                Respond to thoughtfully crafted prompts that spark meaningful memories and stories
+              </p>
+            </div>
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-purple-600">2</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800">AI Enhancement</h3>
+              <p className="text-gray-600">
+                Our AI helps transform your memories into beautifully written stories while preserving your voice
+              </p>
+            </div>
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-purple-600">3</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800">Create Your Legacy</h3>
+              <p className="text-gray-600">
+                Your stories are preserved in a beautiful digital library for generations to come
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="bg-gradient-to-b from-white to-[#E5DEFF] py-24">
+        <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="group">
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-purple-100">
@@ -114,12 +150,24 @@ export default function Index() {
             </div>
           </div>
 
-          {/* Testimonial Section with Natural Background */}
-          <div className="mt-24 text-center p-12 rounded-2xl bg-white/60 backdrop-blur-sm border border-purple-100">
-            <blockquote className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto italic">
-              "Memory Stitcher helped us discover stories from my grandparents that we never would have 
-              thought to ask about. It's like having a family historian in your pocket!"
-            </blockquote>
+          {/* Testimonials Grid */}
+          <div className="mt-24 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white/60 backdrop-blur-sm p-8 rounded-2xl border border-purple-100">
+              <blockquote className="text-lg text-gray-700 italic">
+                "Memory Stitcher helped us discover stories from my grandparents that we never would have 
+                thought to ask about. It's like having a family historian in your pocket!"
+              </blockquote>
+              <p className="mt-4 font-semibold text-gray-900">Sarah M.</p>
+              <p className="text-sm text-gray-600">Preserving family stories for her children</p>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm p-8 rounded-2xl border border-purple-100">
+              <blockquote className="text-lg text-gray-700 italic">
+                "The AI assistance made it so easy to turn my dad's memories into beautiful stories. 
+                He was amazed at how well it captured his voice."
+              </blockquote>
+              <p className="mt-4 font-semibold text-gray-900">Michael T.</p>
+              <p className="text-sm text-gray-600">Documenting his father's life stories</p>
+            </div>
           </div>
 
           {/* Footer */}
