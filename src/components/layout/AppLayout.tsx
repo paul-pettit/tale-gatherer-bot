@@ -75,9 +75,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarHeader className="border-b border-sidebar-border px-6 py-6 bg-[#1A1F2C]">
             <div className="flex items-center justify-center">
               <img 
-                src="https://memorystitcher.com/images/memorystitcher.png" 
+                src="/lovable-uploads/3768ec54-cbb4-495e-8e2a-8bdf03bb62b8.png" 
                 alt="Memory Stitcher" 
-                className="h-12 w-auto brightness-110 contrast-125"
+                className="h-12 w-auto"
               />
             </div>
           </SidebarHeader>
@@ -123,7 +123,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center justify-between p-4 border-b border-border lg:hidden bg-[#1A1F2C]">
               <div className="flex items-center">
                 <img 
-                  src="https://memorystitcher.com/images/memorystitcher.png" 
+                  src="/lovable-uploads/3768ec54-cbb4-495e-8e2a-8bdf03bb62b8.png" 
                   alt="Memory Stitcher" 
                   className="h-8 brightness-110 contrast-125"
                 />
