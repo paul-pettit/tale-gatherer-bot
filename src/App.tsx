@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { StoryGuard } from "@/components/StoryGuard";
 import Index from "./pages/Index";
 import AuthPage from "./pages/auth";
 import NotFound from "./pages/NotFound";
@@ -21,6 +22,15 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route 
+              path="/stories/new" 
+              element={
+                <StoryGuard>
+                  {/* Story creation component will go here */}
+                  <div>New Story Form (Coming Soon)</div>
+                </StoryGuard>
+              } 
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

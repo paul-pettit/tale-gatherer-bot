@@ -105,6 +105,8 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_free_tier: boolean | null
+          single_user_stories: number | null
           updated_at: string
         }
         Insert: {
@@ -112,6 +114,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          is_free_tier?: boolean | null
+          single_user_stories?: number | null
           updated_at?: string
         }
         Update: {
@@ -119,6 +123,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_free_tier?: boolean | null
+          single_user_stories?: number | null
           updated_at?: string
         }
         Relationships: []
