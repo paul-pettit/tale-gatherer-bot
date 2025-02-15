@@ -88,7 +88,7 @@ export default function AdminPage() {
       const [profilesResult, storiesResult, paymentsResult] = await Promise.all([
         supabase
           .from('profiles')
-          .select('*, auth.users(email)')
+          .select('id, full_name, subscription_plan, created_at')
           .order('created_at', { ascending: false }),
         supabase
           .from('stories')
@@ -100,7 +100,19 @@ export default function AdminPage() {
           .order('created_at', { ascending: false }),
       ]);
 
-      if (profilesResult.data) setProfiles(profilesResult.data);
+      if (profilesResult.data) {
+        // We need to fetch user emails separately since we can't join with auth.users
+        const profilesWithEmail = await Promise.all(
+          profilesResult.data.map(async (profile) => {
+            const { data: userData } = await supabase.auth.admin.getUserById(profile.id);
+            return {
+              ...profile,
+              email: userData?.user?.email || 'N/A',
+            };
+          })
+        );
+        setProfiles(profilesWithEmail);
+      }
       if (storiesResult.data) setStories(storiesResult.data);
       if (paymentsResult.data) setPayments(paymentsResult.data);
     } catch (error) {
