@@ -6,20 +6,20 @@ export function FamilyPlansSection() {
   const navigate = useNavigate();
 
   return (
-    <div className="py-24 bg-gray-50">
+    <div className="py-24 bg-muted">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
               Family Plans Coming Soon
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-muted-foreground">
               Experience the power of shared storytelling. Connect with up to 8 family members, collaborate on stories, and build your family's legacy together.
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg p-6">
+            <div className="bg-card rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-4">Collaborative Features</h3>
               <ul className="space-y-3 text-left">
                 <li className="flex items-center">
@@ -36,7 +36,7 @@ export function FamilyPlansSection() {
                 </li>
               </ul>
             </div>
-            <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg p-6">
+            <div className="bg-card rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-4">Enhanced Features</h3>
               <ul className="space-y-3 text-left">
                 <li className="flex items-center">
@@ -55,9 +55,9 @@ export function FamilyPlansSection() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-8 shadow-sm max-w-lg mx-auto">
+          <div className="bg-card rounded-lg p-8 shadow-sm max-w-lg mx-auto">
             <h3 className="text-2xl font-semibold mb-4">Start Free Today</h3>
-            <div className="text-3xl font-bold mb-6">$0<span className="text-lg font-normal text-gray-600">/month</span></div>
+            <div className="text-3xl font-bold mb-6">$0<span className="text-lg font-normal text-muted-foreground">/month</span></div>
             <ul className="space-y-3 mb-6">
               <li className="flex items-center justify-center">
                 <span className="mr-2">✓</span>
@@ -79,7 +79,7 @@ export function FamilyPlansSection() {
             >
               Start Free
             </Button>
-            <p className="text-sm text-gray-500 mt-4">
+            <p className="text-sm text-muted-foreground mt-4">
               Be the first to know when family plans launch
             </p>
           </div>
