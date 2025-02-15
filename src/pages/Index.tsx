@@ -19,7 +19,7 @@ export default function Index() {
         <div className="container mx-auto px-4 py-24 relative">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Preserve Your Family Stories
+              Weave Your Moments Into a Legacy
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8">
               Capture and share precious memories with loved ones. Start preserving your legacy today.
@@ -32,7 +32,7 @@ export default function Index() {
                     onClick={() => navigate("/auth")}
                     className="w-full md:w-auto bg-white text-black hover:bg-white/90"
                   >
-                    Try Free - 5 Stories
+                    Sign Up
                   </Button>
                   <Button
                     size="lg"
@@ -40,7 +40,7 @@ export default function Index() {
                     onClick={() => navigate("/auth")}
                     className="w-full md:w-auto bg-white/10 text-white hover:bg-white/20 border-white"
                   >
-                    Start Family Plan
+                    Sign In
                   </Button>
                 </>
               ) : (

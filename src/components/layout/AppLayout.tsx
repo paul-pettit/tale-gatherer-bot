@@ -63,6 +63,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return location.pathname.startsWith(path);
   };
 
+  // Don't show the sidebar on the index page or when not authenticated
+  if (location.pathname === '/' || !user) {
+    return <main className="min-h-screen">{children}</main>;
+  }
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -114,16 +119,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarFooter>
         </Sidebar>
         <main className="flex-1 overflow-y-auto">
-          <div className="flex items-center justify-between p-4 border-b border-border lg:hidden bg-[#1A1F2C]">
-            <div className="flex items-center">
-              <img 
-                src="https://memorystitcher.com/images/memorystitcher.png" 
-                alt="Memory Stitcher" 
-                className="h-8 brightness-110 contrast-125"
-              />
+          {user && (
+            <div className="flex items-center justify-between p-4 border-b border-border lg:hidden bg-[#1A1F2C]">
+              <div className="flex items-center">
+                <img 
+                  src="https://memorystitcher.com/images/memorystitcher.png" 
+                  alt="Memory Stitcher" 
+                  className="h-8 brightness-110 contrast-125"
+                />
+              </div>
+              <SidebarTrigger />
             </div>
-            <SidebarTrigger />
-          </div>
+          )}
           <div className="p-4">
             {children}
           </div>
