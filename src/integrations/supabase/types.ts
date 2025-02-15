@@ -99,6 +99,41 @@ export type Database = {
           },
         ]
       }
+      interview_transcripts: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json | null
+          story_id: string | null
+          transcript: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          story_id?: string | null
+          transcript: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          story_id?: string | null
+          transcript?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_transcripts_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -152,6 +187,8 @@ export type Database = {
           is_free_tier: boolean | null
           last_payment_date: string | null
           last_payment_status: string | null
+          monthly_story_tokens: number | null
+          purchased_story_credits: number | null
           single_user_stories: number | null
           stripe_customer_id: string | null
           subscription_auto_renew: boolean | null
@@ -160,6 +197,7 @@ export type Database = {
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           subscription_start_date: string | null
+          tokens_reset_date: string | null
           updated_at: string
         }
         Insert: {
@@ -170,6 +208,8 @@ export type Database = {
           is_free_tier?: boolean | null
           last_payment_date?: string | null
           last_payment_status?: string | null
+          monthly_story_tokens?: number | null
+          purchased_story_credits?: number | null
           single_user_stories?: number | null
           stripe_customer_id?: string | null
           subscription_auto_renew?: boolean | null
@@ -178,6 +218,7 @@ export type Database = {
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           subscription_start_date?: string | null
+          tokens_reset_date?: string | null
           updated_at?: string
         }
         Update: {
@@ -188,6 +229,8 @@ export type Database = {
           is_free_tier?: boolean | null
           last_payment_date?: string | null
           last_payment_status?: string | null
+          monthly_story_tokens?: number | null
+          purchased_story_credits?: number | null
           single_user_stories?: number | null
           stripe_customer_id?: string | null
           subscription_auto_renew?: boolean | null
@@ -196,6 +239,7 @@ export type Database = {
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           subscription_start_date?: string | null
+          tokens_reset_date?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -342,6 +386,44 @@ export type Database = {
             columns: ["story_id"]
             isOneToOne: false
             referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          profile_id: string | null
+          status: string
+          stripe_payment_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          status: string
+          stripe_payment_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          status?: string
+          stripe_payment_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_purchases_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
