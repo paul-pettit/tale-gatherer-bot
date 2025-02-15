@@ -14,13 +14,33 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Home, Users, PenSquare, User, LogOut } from "lucide-react";
+import { Home, Users, PenSquare, User, LogOut, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      checkAdminStatus();
+    }
+  }, [user]);
+
+  const checkAdminStatus = async () => {
+    try {
+      const { data: hasRole } = await supabase.rpc('has_role', {
+        _user_id: user?.id,
+        _role: 'admin'
+      });
+      setIsAdmin(hasRole);
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+    }
+  };
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -34,6 +54,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { name: 'Families', href: '/families', icon: Users },
     { name: 'New Story', href: '/stories/new', icon: PenSquare },
     { name: 'Profile', href: '/profile', icon: User },
+    ...(isAdmin ? [{ name: 'Admin', href: '/admin', icon: Shield }] : []),
   ];
 
   const isActive = (path: string) => {
