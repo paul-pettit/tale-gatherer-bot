@@ -4,6 +4,32 @@
 ## Project Overview
 MemoryStitch is an AI-powered biographical storytelling platform that conducts thoughtful interviews to help users preserve their life stories in a meaningful and engaging way.
 
+## Style Guide
+
+### Brand Identity
+- Logo: White version of Memory Stitcher logo
+- Logo placement: Centered in dark brown header area
+- Logo dimensions: 48px height (h-12) for desktop, 32px height (h-8) for mobile
+
+### Color Palette
+- Primary Background: Warm beige (HSL: 34 33% 90%)
+- Header/Logo Background: Rich dark brown (#2C1810)
+- Text Colors:
+  - Primary Text: Dark (HSL: 30 24% 20%)
+  - Muted Text: Medium contrast (HSL: 30 24% 40%)
+- UI Elements:
+  - Cards: Light beige (HSL: 34 33% 95%)
+  - Borders: Soft beige (HSL: 34 33% 80%)
+  - Accent: Light beige (HSL: 34 33% 85%)
+  - Primary Actions: Warm beige (HSL: 26 60% 85%)
+
+### Design Principles
+- Warm and inviting color scheme
+- High contrast for the logo area
+- Consistent use of beige tones throughout the interface
+- Accessible text contrast ratios
+- Responsive design with mobile-friendly navigation
+
 ## Core Features
 
 ### AI Interview System (Primary Focus)
