@@ -13,6 +13,7 @@ type SubscriptionPrice = {
   tier: 'free' | 'basic' | 'premium';
   duration: 'monthly' | 'annual';
   price: number;
+  stripe_price_id: string;
 };
 
 type PlanFeatures = {
@@ -49,10 +50,11 @@ const planFeatures: PlanFeatures = {
 
 export default function SubscriptionPage() {
   const [selectedDuration, setSelectedDuration] = useState<'monthly' | 'annual'>('annual');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const { data: prices, isLoading } = useQuery({
+  const { data: prices, isLoading: isPricesLoading } = useQuery({
     queryKey: ['subscription-prices'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -71,22 +73,52 @@ export default function SubscriptionPage() {
         return;
       }
 
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          subscription_plan: tier,
-          subscription_start_date: new Date().toISOString(),
-          subscription_end_date: tier === 'free' ? null : new Date(Date.now() + (selectedDuration === 'annual' ? 365 : 30) * 24 * 60 * 60 * 1000).toISOString(),
-          is_free_tier: tier === 'free'
-        })
-        .eq('id', user.id);
+      if (tier === 'free') {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            subscription_plan: tier,
+            subscription_start_date: new Date().toISOString(),
+            subscription_end_date: null,
+            is_free_tier: true
+          })
+          .eq('id', user.id);
 
-      if (error) throw error;
+        if (error) throw error;
+        toast.success('Free plan activated successfully!');
+        navigate('/');
+        return;
+      }
 
-      toast.success('Subscription updated successfully!');
-      navigate('/');
+      setIsLoading(true);
+
+      // Find the correct price for the selected tier and duration
+      const selectedPrice = prices?.find(p => p.tier === tier && p.duration === selectedDuration);
+      
+      if (!selectedPrice?.stripe_price_id) {
+        throw new Error('Price not found');
+      }
+
+      // Create checkout session
+      const response = await supabase.functions.invoke('create-checkout', {
+        body: {
+          tier,
+          duration: selectedDuration,
+          userId: user.id,
+          priceId: selectedPrice.stripe_price_id,
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = response.data.url;
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -96,7 +128,7 @@ export default function SubscriptionPage() {
     return price || 0;
   };
 
-  if (isLoading) {
+  if (isPricesLoading) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }
 
@@ -109,12 +141,14 @@ export default function SubscriptionPage() {
             <Button
               variant={selectedDuration === 'monthly' ? 'default' : 'outline'}
               onClick={() => setSelectedDuration('monthly')}
+              disabled={isLoading}
             >
               Monthly
             </Button>
             <Button
               variant={selectedDuration === 'annual' ? 'default' : 'outline'}
               onClick={() => setSelectedDuration('annual')}
+              disabled={isLoading}
             >
               Annual (Save up to 50%)
             </Button>
@@ -150,9 +184,10 @@ export default function SubscriptionPage() {
                 <Button
                   className="w-full"
                   onClick={() => handleSelectPlan(tier)}
+                  disabled={isLoading}
                   variant={tier === 'premium' ? 'default' : 'outline'}
                 >
-                  {tier === 'free' ? 'Start Free' : 'Subscribe Now'}
+                  {isLoading ? 'Processing...' : tier === 'free' ? 'Start Free' : 'Subscribe Now'}
                 </Button>
               </CardFooter>
             </Card>

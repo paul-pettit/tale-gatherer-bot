@@ -99,6 +99,50 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          profile_id: string | null
+          status: string
+          stripe_payment_id: string
+          subscription_duration: Database["public"]["Enums"]["subscription_duration"]
+          subscription_tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          status: string
+          stripe_payment_id: string
+          subscription_duration: Database["public"]["Enums"]["subscription_duration"]
+          subscription_tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          status?: string
+          stripe_payment_id?: string
+          subscription_duration?: Database["public"]["Enums"]["subscription_duration"]
+          subscription_tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -106,7 +150,10 @@ export type Database = {
           full_name: string | null
           id: string
           is_free_tier: boolean | null
+          last_payment_date: string | null
+          last_payment_status: string | null
           single_user_stories: number | null
+          stripe_customer_id: string | null
           subscription_auto_renew: boolean | null
           subscription_end_date: string | null
           subscription_plan:
@@ -121,7 +168,10 @@ export type Database = {
           full_name?: string | null
           id: string
           is_free_tier?: boolean | null
+          last_payment_date?: string | null
+          last_payment_status?: string | null
           single_user_stories?: number | null
+          stripe_customer_id?: string | null
           subscription_auto_renew?: boolean | null
           subscription_end_date?: string | null
           subscription_plan?:
@@ -136,7 +186,10 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_free_tier?: boolean | null
+          last_payment_date?: string | null
+          last_payment_status?: string | null
           single_user_stories?: number | null
+          stripe_customer_id?: string | null
           subscription_auto_renew?: boolean | null
           subscription_end_date?: string | null
           subscription_plan?:
