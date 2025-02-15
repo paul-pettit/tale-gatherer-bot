@@ -16,7 +16,7 @@ export function Navigation({ isLoggedIn }: NavigationProps) {
           <img 
             src="/lovable-uploads/e32eb416-f89a-47ac-a548-fb5cd566fa06.png"
             alt="Memory Stitcher" 
-            className="h-20 w-auto"
+            className="h-32 w-auto"
           />
           {!isLoggedIn && (
             <div className="space-x-4">
