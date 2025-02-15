@@ -349,6 +349,7 @@ export type Database = {
           duration: Database["public"]["Enums"]["subscription_duration"]
           id: string
           price: number
+          stripe_price_id: string
           tier: Database["public"]["Enums"]["subscription_tier"]
           updated_at: string
         }
@@ -357,6 +358,7 @@ export type Database = {
           duration: Database["public"]["Enums"]["subscription_duration"]
           id?: string
           price: number
+          stripe_price_id: string
           tier: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
         }
@@ -365,6 +367,7 @@ export type Database = {
           duration?: Database["public"]["Enums"]["subscription_duration"]
           id?: string
           price?: number
+          stripe_price_id?: string
           tier?: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
         }
