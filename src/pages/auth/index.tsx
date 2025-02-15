@@ -28,6 +28,7 @@ export default function AuthPage() {
 
       if (isSignUp) {
         toast.success('Registration successful! Please check your email to verify your account.');
+        navigate('/subscription');
       } else {
         toast.success('Welcome back!');
         navigate('/');

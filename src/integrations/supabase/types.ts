@@ -107,6 +107,12 @@ export type Database = {
           id: string
           is_free_tier: boolean | null
           single_user_stories: number | null
+          subscription_auto_renew: boolean | null
+          subscription_end_date: string | null
+          subscription_plan:
+            | Database["public"]["Enums"]["subscription_tier"]
+            | null
+          subscription_start_date: string | null
           updated_at: string
         }
         Insert: {
@@ -116,6 +122,12 @@ export type Database = {
           id: string
           is_free_tier?: boolean | null
           single_user_stories?: number | null
+          subscription_auto_renew?: boolean | null
+          subscription_end_date?: string | null
+          subscription_plan?:
+            | Database["public"]["Enums"]["subscription_tier"]
+            | null
+          subscription_start_date?: string | null
           updated_at?: string
         }
         Update: {
@@ -125,6 +137,12 @@ export type Database = {
           id?: string
           is_free_tier?: boolean | null
           single_user_stories?: number | null
+          subscription_auto_renew?: boolean | null
+          subscription_end_date?: string | null
+          subscription_plan?:
+            | Database["public"]["Enums"]["subscription_tier"]
+            | null
+          subscription_start_date?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -272,6 +290,33 @@ export type Database = {
           },
         ]
       }
+      subscription_prices: {
+        Row: {
+          created_at: string
+          duration: Database["public"]["Enums"]["subscription_duration"]
+          id: string
+          price: number
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration: Database["public"]["Enums"]["subscription_duration"]
+          id?: string
+          price: number
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration?: Database["public"]["Enums"]["subscription_duration"]
+          id?: string
+          price?: number
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -287,6 +332,7 @@ export type Database = {
         | "personal_achievements"
         | "historical_events"
       story_status: "draft" | "published" | "private"
+      subscription_duration: "monthly" | "annual"
       subscription_tier: "free" | "basic" | "premium" | "enterprise"
     }
     CompositeTypes: {

@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { StoryGuard } from "@/components/StoryGuard";
 import Index from "./pages/Index";
 import AuthPage from "./pages/auth";
+import SubscriptionPage from "./pages/subscription";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/subscription" element={<SubscriptionPage />} />
             <Route 
               path="/stories/new" 
               element={
