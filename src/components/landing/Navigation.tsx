@@ -14,7 +14,7 @@ export function Navigation({ isLoggedIn }: NavigationProps) {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-24">
           <img 
-            src="/lovable-uploads/3768ec54-cbb4-495e-8e2a-8bdf03bb62b8.png"
+            src="/lovable-uploads/e32eb416-f89a-47ac-a548-fb5cd566fa06.png"
             alt="Memory Stitcher" 
             className="h-16 w-auto"
           />
