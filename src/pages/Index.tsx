@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -84,27 +85,25 @@ export default function Index() {
           <div className="grid md:grid-cols-3 gap-12">
             <div className="text-center">
               <div className="bg-gray-50 rounded-lg p-6 h-full shadow-sm">
-                <h3 className="text-xl font-semibold mb-4">Easy to Use</h3>
+                <h3 className="text-xl font-semibold mb-4">Collaborative Storytelling</h3>
                 <p className="text-gray-600">
-                  Start writing and sharing your stories in minutes with our
-                  intuitive interface.
+                  Multiple family members can contribute to the same story, adding their unique perspectives.
                 </p>
               </div>
             </div>
             <div className="text-center">
               <div className="bg-gray-50 rounded-lg p-6 h-full shadow-sm">
-                <h3 className="text-xl font-semibold mb-4">Family Collaboration</h3>
+                <h3 className="text-xl font-semibold mb-4">Story Incentives</h3>
                 <p className="text-gray-600">
-                  Invite family members to contribute their own stories and memories.
+                  Encourage storytelling through gift card contributions and family rewards.
                 </p>
               </div>
             </div>
             <div className="text-center">
               <div className="bg-gray-50 rounded-lg p-6 h-full shadow-sm">
-                <h3 className="text-xl font-semibold mb-4">Secure & Private</h3>
+                <h3 className="text-xl font-semibold mb-4">Private & Secure</h3>
                 <p className="text-gray-600">
-                  Your stories are safely stored and shared only with those you
-                  choose.
+                  Control who sees your stories with flexible privacy settings for family sharing.
                 </p>
               </div>
             </div>
@@ -116,10 +115,10 @@ export default function Index() {
       <div className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Choose Your Plan
+            Choose Your Family Plan
           </h2>
           <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-4 gap-8">
+            <div className="grid md:grid-cols-3 gap-8">
               {/* Free Tier */}
               <div className="bg-white rounded-lg p-8 shadow-sm">
                 <h3 className="text-2xl font-semibold mb-4">Free Tier</h3>
@@ -147,22 +146,33 @@ export default function Index() {
                 </Button>
               </div>
 
-              {/* Basic Family Plan */}
-              <div className="bg-white rounded-lg p-8 shadow-sm">
-                <h3 className="text-2xl font-semibold mb-4">Basic Family</h3>
-                <div className="text-3xl font-bold mb-6">$9<span className="text-lg font-normal text-gray-600">/month</span></div>
+              {/* Standard Family Plan */}
+              <div className="bg-white rounded-lg p-8 shadow-sm border-2 border-primary">
+                <div className="inline-block bg-primary text-white px-3 py-1 rounded-full text-sm mb-4">
+                  Most Popular
+                </div>
+                <h3 className="text-2xl font-semibold mb-4">Standard Family</h3>
+                <div className="text-3xl font-bold mb-6">$20<span className="text-lg font-normal text-gray-600">/month</span></div>
                 <ul className="space-y-3 mb-6">
+                  <li className="flex items-center">
+                    <span className="mr-2">✓</span>
+                    Up to 8 family members
+                  </li>
                   <li className="flex items-center">
                     <span className="mr-2">✓</span>
                     Unlimited stories
                   </li>
                   <li className="flex items-center">
                     <span className="mr-2">✓</span>
-                    Up to 5 members
+                    Story incentives
                   </li>
                   <li className="flex items-center">
                     <span className="mr-2">✓</span>
-                    Basic collaboration
+                    Version control
+                  </li>
+                  <li className="flex items-center">
+                    <span className="mr-2">✓</span>
+                    $3/month per extra member
                   </li>
                 </ul>
                 <Button
@@ -170,64 +180,34 @@ export default function Index() {
                   onClick={() => navigate("/auth")}
                   className="w-full"
                 >
-                  Choose Basic
+                  Choose Standard
                 </Button>
               </div>
 
-              {/* Premium Family Plan */}
-              <div className="bg-white rounded-lg p-8 shadow-sm border-2 border-primary">
-                <div className="inline-block bg-primary text-white px-3 py-1 rounded-full text-sm mb-4">
-                  Most Popular
-                </div>
-                <h3 className="text-2xl font-semibold mb-4">Premium Family</h3>
-                <div className="text-3xl font-bold mb-6">$19<span className="text-lg font-normal text-gray-600">/month</span></div>
+              {/* Extended Family Plan */}
+              <div className="bg-white rounded-lg p-8 shadow-sm">
+                <h3 className="text-2xl font-semibold mb-4">Extended Family</h3>
+                <div className="text-3xl font-bold mb-6">$35<span className="text-lg font-normal text-gray-600">/month</span></div>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center">
                     <span className="mr-2">✓</span>
-                    Unlimited stories
+                    Up to 20 family members
                   </li>
                   <li className="flex items-center">
                     <span className="mr-2">✓</span>
-                    Up to 10 members
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    Advanced features
+                    All Standard features
                   </li>
                   <li className="flex items-center">
                     <span className="mr-2">✓</span>
                     Priority support
                   </li>
-                </ul>
-                <Button
-                  size="lg"
-                  onClick={() => navigate("/auth")}
-                  className="w-full"
-                >
-                  Choose Premium
-                </Button>
-              </div>
-
-              {/* Enterprise Family Plan */}
-              <div className="bg-white rounded-lg p-8 shadow-sm">
-                <h3 className="text-2xl font-semibold mb-4">Enterprise</h3>
-                <div className="text-3xl font-bold mb-6">$49<span className="text-lg font-normal text-gray-600">/month</span></div>
-                <ul className="space-y-3 mb-6">
                   <li className="flex items-center">
                     <span className="mr-2">✓</span>
-                    Unlimited stories
+                    Advanced collaboration
                   </li>
                   <li className="flex items-center">
                     <span className="mr-2">✓</span>
-                    Unlimited members
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    Custom features
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2">✓</span>
-                    24/7 support
+                    $3/month per extra member
                   </li>
                 </ul>
                 <Button
@@ -235,7 +215,7 @@ export default function Index() {
                   onClick={() => navigate("/auth")}
                   className="w-full"
                 >
-                  Contact Sales
+                  Choose Extended
                 </Button>
               </div>
             </div>
