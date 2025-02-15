@@ -1,7 +1,7 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Configuration, OpenAIApi } from "https://esm.sh/openai@3.2.1";
+import { OpenAI } from "https://esm.sh/openai@4.24.1";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -21,53 +21,56 @@ serve(async (req) => {
     }
 
     const { prompt, context, messages, userId, storyId } = await req.json();
+    if (!prompt || !userId || !storyId) {
+      throw new Error('Missing required parameters');
+    }
 
-    // Create Supabase client to fetch system prompt and user profile
+    // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Fetch user profile
+    // Get user profile for context
     const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
       .select('first_name, age, hometown, gender')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
     if (profileError) {
-      throw new Error('Failed to fetch user profile');
+      throw new Error(`Failed to fetch user profile: ${profileError.message}`);
     }
 
-    // Fetch the interview system prompt
+    // Get system prompt
     const { data: systemPrompts, error: promptError } = await supabaseClient
       .from('system_prompts')
       .select('content')
       .eq('type', 'interview')
-      .limit(1)
-      .single();
+      .maybeSingle();
 
     if (promptError) {
-      throw new Error('Failed to fetch system prompt');
+      throw new Error(`Failed to fetch system prompt: ${promptError.message}`);
     }
 
-    const configuration = new Configuration({
-      apiKey: openAiKey,
-    });
+    if (!systemPrompts?.content) {
+      throw new Error('System prompt not found');
+    }
 
-    const openai = new OpenAIApi(configuration);
-    const model = 'gpt-4o-mini';
+    const openai = new OpenAI({ apiKey: openAiKey });
 
-    // Replace placeholders in the system prompt with actual values
+    // Format system prompt with user context
     const systemPrompt = systemPrompts.content
-      .replace('${context}', context)
-      .replace('${firstName}', profile.first_name || '')
-      .replace('${age}', profile.age?.toString() || '')
-      .replace('${hometown}', profile.hometown || '')
-      .replace('${gender}', profile.gender || '');
+      .replace('${context}', context || '')
+      .replace('${firstName}', profile?.first_name || '')
+      .replace('${age}', profile?.age?.toString() || '')
+      .replace('${hometown}', profile?.hometown || '')
+      .replace('${gender}', profile?.gender || '');
 
-    const response = await openai.createChatCompletion({
-      model,
+    const startTime = Date.now();
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4",
       messages: [
         { role: 'system', content: systemPrompt },
         ...messages,
@@ -77,15 +80,10 @@ serve(async (req) => {
       max_tokens: 500,
     });
 
-    const answer = response.data.choices[0]?.message?.content || 'I apologize, but I am unable to continue the conversation at this moment.';
+    const endTime = Date.now();
+    const answer = response.choices[0]?.message?.content || 'I apologize, but I am unable to continue the conversation at this moment.';
     
-    // Calculate approximate token usage and cost
-    const promptTokens = JSON.stringify(messages).length / 4;
-    const responseTokens = answer.length / 4;
-    const totalTokens = Math.ceil(promptTokens + responseTokens);
-    const costUsd = totalTokens * 0.00001;
-
-    // Log the prompt usage
+    // Log the prompt usage with detailed timing
     await supabaseClient
       .from('prompt_logs')
       .insert({
@@ -93,10 +91,12 @@ serve(async (req) => {
         story_id: storyId,
         prompt: JSON.stringify(messages),
         response: answer,
-        model,
-        tokens_used: totalTokens,
-        cost_usd: costUsd,
-        status: 'success'
+        model: 'gpt-4',
+        tokens_used: response.usage?.total_tokens || 0,
+        cost_usd: (response.usage?.total_tokens || 0) * 0.00003, // Updated cost for GPT-4
+        status: 'success',
+        request_timestamp: new Date(startTime).toISOString(),
+        response_timestamp: new Date(endTime).toISOString()
       });
 
     return new Response(
@@ -106,8 +106,35 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in interview function:', error);
+
+    // Log the error if we have user and story context
+    try {
+      const { userId, storyId } = await req.json();
+      if (userId && storyId) {
+        const supabaseClient = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        );
+
+        await supabaseClient
+          .from('prompt_logs')
+          .insert({
+            user_id: userId,
+            story_id: storyId,
+            status: 'error',
+            error_message: error.message,
+            request_timestamp: new Date().toISOString()
+          });
+      }
+    } catch (logError) {
+      console.error('Error logging failure:', logError);
+    }
+
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: 'An error occurred processing your request',
+        details: error.message 
+      }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
