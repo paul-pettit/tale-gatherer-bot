@@ -36,11 +36,11 @@ export default function FamilyDetailsPage() {
         .from('families')
         .select(`
           *,
-          family_members (
+          family_members!inner (
             id,
             role,
             is_admin,
-            profile:profiles (
+            profiles!inner (
               full_name,
               avatar_url
             )
@@ -50,7 +50,26 @@ export default function FamilyDetailsPage() {
         .single();
 
       if (error) throw error;
-      return data as FamilyDetails;
+
+      // Transform the data to match our FamilyDetails interface
+      const transformedData: FamilyDetails = {
+        id: data.id,
+        name: data.name,
+        created_at: data.created_at,
+        max_members: data.max_members,
+        subscription_tier: data.subscription_tier,
+        family_members: data.family_members.map((member: any) => ({
+          id: member.id,
+          role: member.role,
+          is_admin: member.is_admin,
+          profile: {
+            full_name: member.profiles.full_name,
+            avatar_url: member.profiles.avatar_url,
+          }
+        }))
+      };
+
+      return transformedData;
     },
   });
 
