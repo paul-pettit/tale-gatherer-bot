@@ -16,10 +16,11 @@ export function useFreeTier() {
         .from('profiles')
         .select('single_user_stories, is_free_tier')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data;
+      // If no profile exists yet, return default values
+      return data || { single_user_stories: 0, is_free_tier: true };
     },
     enabled: !!user,
   });
