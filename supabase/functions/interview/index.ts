@@ -27,7 +27,7 @@ serve(async (req) => {
     });
 
     const openai = new OpenAIApi(configuration);
-    const model = 'gpt-4o-mini'; // Using the faster, cheaper model
+    const model = 'gpt-4'; // Fixed model name
 
     const response = await openai.createChatCompletion({
       model,
@@ -39,7 +39,10 @@ serve(async (req) => {
           2. Show genuine interest in their experiences
           3. Help them recall specific details and emotions
           4. Keep responses focused but encouraging
-          5. Guide them toward meaningful reflections` },
+          5. Guide them toward meaningful reflections
+          6. If they mention a location, ask about specific details of that place
+          7. If they mention a person, ask about their relationship with that person
+          8. If they mention an event, ask about how it made them feel` },
         ...messages,
         { role: 'user', content: prompt }
       ],
