@@ -24,6 +24,7 @@ export default function NewStoryPage() {
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [personalFamilyId, setPersonalFamilyId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRandomQuestions = async () => {
@@ -46,12 +47,67 @@ export default function NewStoryPage() {
       }
     };
 
+    const getOrCreatePersonalFamily = async () => {
+      if (!user) return;
+
+      try {
+        // First, try to find existing personal family
+        const { data: families, error: fetchError } = await supabase
+          .from('families')
+          .select('id')
+          .eq('created_by', user.id)
+          .limit(1);
+
+        if (fetchError) throw fetchError;
+
+        if (families && families.length > 0) {
+          setPersonalFamilyId(families[0].id);
+        } else {
+          // Create new personal family
+          const { data: newFamily, error: createError } = await supabase
+            .from('families')
+            .insert({
+              name: 'Personal Stories',
+              created_by: user.id,
+              subscription_tier: 'free'
+            })
+            .select('id')
+            .single();
+
+          if (createError) throw createError;
+
+          // Add user as family member
+          const { error: memberError } = await supabase
+            .from('family_members')
+            .insert({
+              family_id: newFamily.id,
+              profile_id: user.id,
+              is_admin: true,
+              role: 'owner'
+            });
+
+          if (memberError) throw memberError;
+
+          setPersonalFamilyId(newFamily.id);
+        }
+      } catch (error) {
+        console.error('Error setting up personal family:', error);
+        toast.error('Failed to set up personal space');
+      }
+    };
+
     fetchRandomQuestions();
-  }, []);
+    getOrCreatePersonalFamily();
+  }, [user]);
 
   const handleQuestionSelect = async (question: Question) => {
     if (!user) {
       toast.error('You must be logged in to create a story');
+      return;
+    }
+
+    if (!personalFamilyId) {
+      toast.error('Failed to create story: Personal space not set up');
       return;
     }
 
@@ -63,6 +119,7 @@ export default function NewStoryPage() {
           title: `Story about ${question.category}`,
           content: '',
           author_id: user.id,
+          family_id: personalFamilyId,  // Add the required family_id
           status: 'draft',
           question_id: question.id
         })
