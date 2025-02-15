@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Home, Users, PenSquare, User, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -44,12 +45,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <Sidebar>
-          <SidebarHeader className="border-b border-sidebar-border px-6 py-4">
+          <SidebarHeader className="border-b border-sidebar-border px-6 py-6 bg-[#2C1810]">
             <div className="flex items-center justify-center">
               <img 
                 src="https://memorystitcher.com/images/memorystitcher.png" 
                 alt="Memory Stitcher" 
-                className="h-8"
+                className="h-12 w-auto"
               />
             </div>
           </SidebarHeader>
@@ -91,12 +92,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarFooter>
         </Sidebar>
         <main className="flex-1 overflow-y-auto">
-          <div className="flex items-center justify-between p-4 border-b border-border lg:hidden bg-sidebar-background">
+          <div className="flex items-center justify-between p-4 border-b border-border lg:hidden bg-[#2C1810]">
             <div className="flex items-center">
               <img 
                 src="https://memorystitcher.com/images/memorystitcher.png" 
                 alt="Memory Stitcher" 
-                className="h-6"
+                className="h-8"
               />
             </div>
             <SidebarTrigger />
