@@ -10,7 +10,7 @@ export function Navigation({ isLoggedIn }: NavigationProps) {
   const navigate = useNavigate();
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/50 to-transparent">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#2C1810]/80 to-transparent">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-24">
           <img 
@@ -23,13 +23,13 @@ export function Navigation({ isLoggedIn }: NavigationProps) {
               <Button
                 variant="ghost"
                 onClick={() => navigate("/auth")}
-                className="text-white hover:bg-white/10"
+                className="text-white hover:bg-[#2C1810]/20"
               >
                 Sign In
               </Button>
               <Button
                 onClick={() => navigate("/auth")}
-                className="bg-white text-black hover:bg-white/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 Sign Up
               </Button>
