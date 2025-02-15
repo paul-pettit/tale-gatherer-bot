@@ -11,7 +11,7 @@ export default function Index() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <div className="relative min-h-[80vh] flex items-center">
-        <div className="absolute inset-0 bg-[url('https://plus.unsplash.com/premium_photo-1661538826593-7d629944a11a')] bg-cover bg-center bg-no-repeat" />
+        <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/3818956/pexels-photo-3818956.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')] bg-cover bg-center bg-no-repeat" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/50" />
         
         <div className="container mx-auto px-4 py-24 relative">
