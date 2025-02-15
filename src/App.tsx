@@ -11,6 +11,7 @@ import AuthPage from "./pages/auth";
 import SubscriptionPage from "./pages/subscription";
 import SubscriptionSuccess from "./pages/subscription/success";
 import NotFound from "./pages/NotFound";
+import FamiliesPage from "./pages/families";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/subscription" element={<SubscriptionPage />} />
             <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+            <Route path="/families" element={<FamiliesPage />} />
             <Route 
               path="/stories/new" 
               element={
