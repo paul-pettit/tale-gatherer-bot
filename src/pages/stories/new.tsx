@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +13,7 @@ import debounce from 'lodash/debounce';
 export default function NewStoryPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { remainingStories, incrementStoryCount } = useFreeTier();
+  const { remainingStories, decrementStoryToken } = useFreeTier();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -149,7 +148,7 @@ export default function NewStoryPage() {
 
       if (error) throw error;
 
-      await incrementStoryCount();
+      await decrementStoryToken();
       toast.success('Story published successfully!');
       navigate('/');
     } catch (error) {
@@ -169,9 +168,13 @@ export default function NewStoryPage() {
         <CardHeader>
           <CardTitle>Create New Story</CardTitle>
           <div className="space-y-2">
-            {remainingStories > 0 && (
+            {remainingStories > 0 ? (
               <p className="text-sm text-muted-foreground">
-                You have {remainingStories} stories remaining in your free tier
+                You have {remainingStories} {remainingStories === 1 ? 'story' : 'stories'} remaining
+              </p>
+            ) : (
+              <p className="text-sm text-destructive">
+                You have no remaining stories. Please upgrade or purchase additional credits.
               </p>
             )}
             {lastSaved && (
@@ -211,7 +214,7 @@ export default function NewStoryPage() {
               </Button>
               <Button
                 type="submit"
-                disabled={isSubmitting || !draftId}
+                disabled={isSubmitting || !draftId || remainingStories <= 0}
               >
                 {isSubmitting ? 'Publishing...' : 'Publish Story'}
               </Button>

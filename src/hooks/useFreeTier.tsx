@@ -14,23 +14,31 @@ export function useFreeTier() {
       if (!user) return null;
       const { data, error } = await supabase
         .from('profiles')
-        .select('single_user_stories, is_free_tier')
+        .select('monthly_story_tokens, tokens_reset_date, is_free_tier, purchased_story_credits')
         .eq('id', user.id)
         .maybeSingle();
 
       if (error) throw error;
       // If no profile exists yet, return default values
-      return data || { single_user_stories: 0, is_free_tier: true };
+      return data || { 
+        monthly_story_tokens: 5, 
+        tokens_reset_date: new Date().toISOString(),
+        is_free_tier: true,
+        purchased_story_credits: 0
+      };
     },
     enabled: !!user,
   });
 
-  const { mutate: incrementStoryCount } = useMutation({
+  const { mutate: decrementStoryToken } = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('User not authenticated');
+      
+      const newTokenCount = (freeTierInfo?.monthly_story_tokens || 0) - 1;
+      
       const { error } = await supabase
         .from('profiles')
-        .update({ single_user_stories: (freeTierInfo?.single_user_stories || 0) + 1 })
+        .update({ monthly_story_tokens: newTokenCount })
         .eq('id', user.id);
 
       if (error) throw error;
@@ -43,14 +51,18 @@ export function useFreeTier() {
     },
   });
 
-  const canCreateStory = freeTierInfo?.is_free_tier && (freeTierInfo?.single_user_stories || 0) < 5;
-  const remainingStories = freeTierInfo?.is_free_tier ? 5 - (freeTierInfo?.single_user_stories || 0) : 0;
+  // Calculate if the user can create a story based on available tokens
+  const availableTokens = (freeTierInfo?.monthly_story_tokens || 0) + (freeTierInfo?.purchased_story_credits || 0);
+  const canCreateStory = availableTokens > 0;
+  
+  // Return remaining tokens including both monthly and purchased credits
+  const remainingStories = availableTokens;
 
   return {
     isLoading,
     canCreateStory,
     remainingStories,
-    incrementStoryCount,
+    decrementStoryToken,
     isFreeTier: freeTierInfo?.is_free_tier,
   };
 }
