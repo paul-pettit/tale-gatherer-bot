@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { MessageList } from "./MessageList";
+import { MessageInput } from "./MessageInput";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -27,12 +27,10 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
   const { user } = useAuth();
 
   useEffect(() => {
-    // Initialize messages with the question
     setMessages([{ role: 'assistant', content: `Let's talk about this: ${question}` }]);
   }, [question]);
 
   useEffect(() => {
-    // Load existing messages when component mounts
     const loadMessages = async () => {
       if (!sessionId) return;
 
@@ -51,7 +49,6 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
             content: msg.content
           }));
           
-          // Only set existing messages if there are any to prevent overwriting the initial question
           if (existingMessages.length > 0) {
             setMessages(existingMessages);
           }
@@ -75,7 +72,6 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
     setIsLoading(true);
 
     try {
-      // Save user message
       const { error: saveError } = await supabase
         .from('chat_messages')
         .insert({
@@ -86,7 +82,6 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
 
       if (saveError) throw saveError;
 
-      // Get story ID from the chat session
       const { data: sessionData, error: sessionError } = await supabase
         .from('chat_sessions')
         .select('story_id')
@@ -95,7 +90,6 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
 
       if (sessionError) throw sessionError;
 
-      // Get AI response
       const response = await fetch('/api/interview', {
         method: 'POST',
         headers: {
@@ -116,7 +110,6 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
       
       const { answer } = await response.json();
       
-      // Save assistant message
       const { error: assistantError } = await supabase
         .from('chat_messages')
         .insert({
@@ -145,7 +138,6 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
 
     setIsFinishing(true);
     try {
-      // Get story ID from the chat session
       const { data: sessionData, error: sessionError } = await supabase
         .from('chat_sessions')
         .select('story_id')
@@ -154,7 +146,6 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
 
       if (sessionError) throw sessionError;
 
-      // Get AI to summarize the conversation into a coherent story
       const response = await fetch('/api/interview', {
         method: 'POST',
         headers: {
@@ -187,40 +178,14 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
         <CardTitle>Interview Session</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
-        <ScrollArea className="flex-1 pr-4">
-          <div className="space-y-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${
-                  message.role === 'assistant' ? 'justify-start' : 'justify-end'
-                }`}
-              >
-                <div
-                  className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                    message.role === 'assistant'
-                      ? 'bg-muted'
-                      : 'bg-primary text-primary-foreground'
-                  }`}
-                >
-                  {message.content}
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
+        <MessageList messages={messages} />
         <div className="mt-4 space-y-2">
-          <form onSubmit={handleSendMessage} className="flex gap-2">
-            <Input
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your message..."
-              disabled={isLoading || isFinishing}
-            />
-            <Button type="submit" disabled={isLoading || isFinishing}>
-              Send
-            </Button>
-          </form>
+          <MessageInput
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+            onSend={handleSendMessage}
+            isDisabled={isLoading || isFinishing}
+          />
           <Button 
             onClick={handleFinish} 
             variant="secondary" 
