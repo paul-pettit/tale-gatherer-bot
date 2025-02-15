@@ -12,6 +12,7 @@ import SubscriptionPage from "./pages/subscription";
 import SubscriptionSuccess from "./pages/subscription/success";
 import NotFound from "./pages/NotFound";
 import FamiliesPage from "./pages/families";
+import FamilyDetailsPage from "./pages/families/[id]";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/subscription" element={<SubscriptionPage />} />
             <Route path="/subscription/success" element={<SubscriptionSuccess />} />
             <Route path="/families" element={<FamiliesPage />} />
+            <Route path="/families/:id" element={<FamilyDetailsPage />} />
             <Route 
               path="/stories/new" 
               element={
