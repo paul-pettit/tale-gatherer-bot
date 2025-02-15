@@ -9,7 +9,263 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      families: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          max_members: number
+          name: string
+          subscription_tier: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          max_members?: number
+          name: string
+          subscription_tier?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          max_members?: number
+          name?: string
+          subscription_tier?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "families_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_members: {
+        Row: {
+          created_at: string
+          family_id: string
+          id: string
+          is_admin: boolean | null
+          profile_id: string
+          role: string
+          subscription_paid_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          family_id: string
+          id?: string
+          is_admin?: boolean | null
+          profile_id: string
+          role?: string
+          subscription_paid_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          family_id?: string
+          id?: string
+          is_admin?: boolean | null
+          profile_id?: string
+          role?: string
+          subscription_paid_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_subscription_paid_by_fkey"
+            columns: ["subscription_paid_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          category: Database["public"]["Enums"]["question_category"]
+          created_at: string
+          description: string | null
+          id: string
+          question: string
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["question_category"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          question: string
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["question_category"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          question?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      stories: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          family_id: string
+          id: string
+          question_id: string | null
+          status: Database["public"]["Enums"]["story_status"] | null
+          title: string
+          updated_at: string
+          version: number | null
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          family_id: string
+          id?: string
+          question_id?: string | null
+          status?: Database["public"]["Enums"]["story_status"] | null
+          title: string
+          updated_at?: string
+          version?: number | null
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          family_id?: string
+          id?: string
+          question_id?: string | null
+          status?: Database["public"]["Enums"]["story_status"] | null
+          title?: string
+          updated_at?: string
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stories_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stories_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stories_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_contributions: {
+        Row: {
+          amount: number
+          contributor_id: string
+          created_at: string
+          id: string
+          recipient_id: string
+          status: string | null
+          story_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          contributor_id: string
+          created_at?: string
+          id?: string
+          recipient_id: string
+          status?: string | null
+          story_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          contributor_id?: string
+          created_at?: string
+          id?: string
+          recipient_id?: string
+          status?: string | null
+          story_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_contributions_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "story_contributions_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "story_contributions_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +274,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      question_category:
+        | "childhood_memories"
+        | "life_lessons"
+        | "family_traditions"
+        | "personal_achievements"
+        | "historical_events"
+      story_status: "draft" | "published" | "private"
     }
     CompositeTypes: {
       [_ in never]: never
