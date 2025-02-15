@@ -11,6 +11,36 @@ export default function Index() {
 
   return (
     <div className="min-h-screen">
+      {/* Navigation */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/50 to-transparent">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <img 
+              src="https://memorystitcher.com/images/memorystitcher.png" 
+              alt="Memory Stitcher" 
+              className="h-8 brightness-110 contrast-125"
+            />
+            {!user && (
+              <div className="space-x-4">
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/auth")}
+                  className="text-white hover:bg-white/10"
+                >
+                  Sign In
+                </Button>
+                <Button
+                  onClick={() => navigate("/auth")}
+                  className="bg-white text-black hover:bg-white/90"
+                >
+                  Sign Up
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <div className="relative min-h-[80vh] flex items-center">
         <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/3818956/pexels-photo-3818956.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')] bg-cover bg-center bg-no-repeat" />
@@ -24,54 +54,34 @@ export default function Index() {
             <p className="text-xl md:text-2xl text-white/90 mb-8">
               Capture and share precious memories with loved ones. Start preserving your legacy today.
             </p>
-            <div className="space-y-4 md:space-y-0 md:space-x-4">
-              {!user ? (
-                <>
-                  <Button
-                    size="lg"
-                    onClick={() => navigate("/auth")}
-                    className="w-full md:w-auto bg-white text-black hover:bg-white/90"
-                  >
-                    Sign Up
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={() => navigate("/auth")}
-                    className="w-full md:w-auto bg-white/10 text-white hover:bg-white/20 border-white"
-                  >
-                    Sign In
-                  </Button>
-                </>
-              ) : (
-                <div className="space-y-4">
-                  <Button
-                    size="lg"
-                    onClick={() => navigate("/stories/new")}
-                    className="w-full md:w-auto bg-white text-black hover:bg-white/90"
-                  >
-                    {isFreeTier 
-                      ? `Write a Story (${remainingStories} remaining)`
-                      : "Write a Story"
-                    }
-                  </Button>
-                  {isFreeTier && remainingStories < 2 && (
-                    <div className="text-center md:text-left">
-                      <p className="text-white/90 text-sm">
-                        Running low on stories? 
-                        <Button
-                          variant="link"
-                          className="text-white underline ml-1 p-0 h-auto"
-                          onClick={() => navigate("/upgrade")}
-                        >
-                          Upgrade to our family plan
-                        </Button>
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+            {user && (
+              <div className="space-y-4">
+                <Button
+                  size="lg"
+                  onClick={() => navigate("/stories/new")}
+                  className="w-full md:w-auto bg-white text-black hover:bg-white/90"
+                >
+                  {isFreeTier 
+                    ? `Write a Story (${remainingStories} remaining)`
+                    : "Write a Story"
+                  }
+                </Button>
+                {isFreeTier && remainingStories < 2 && (
+                  <div className="text-center md:text-left">
+                    <p className="text-white/90 text-sm">
+                      Running low on stories? 
+                      <Button
+                        variant="link"
+                        className="text-white underline ml-1 p-0 h-auto"
+                        onClick={() => navigate("/upgrade")}
+                      >
+                        Upgrade to our family plan
+                      </Button>
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
