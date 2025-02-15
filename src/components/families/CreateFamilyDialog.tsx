@@ -40,6 +40,7 @@ export function CreateFamilyDialog() {
         .insert({
           name: familyName.trim(),
           created_by: user.id,
+          subscription_tier: 'basic' // Only paid tier users can create additional families
         });
 
       if (error) throw error;
