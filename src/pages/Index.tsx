@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -57,14 +56,66 @@ export default function Index() {
                 </Button>
               ) : (
                 <>
-                  <Button 
-                    size="lg" 
-                    onClick={() => navigate('/auth')}
-                    className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-lg px-8 py-6 transform transition-all hover:scale-105"
-                  >
-                    Start Your Family's Legacy - $99/year
-                  </Button>
-                  <p className="text-white/80 text-sm">30-day money-back guarantee</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
+                    <div className="bg-white/90 backdrop-blur-sm p-6 rounded-xl border-2 border-purple-200 hover:border-purple-400 transition-all">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-2">Family Plan</h3>
+                      <p className="text-gray-600 mb-4">Perfect for immediate family</p>
+                      <ul className="space-y-2 mb-6 text-gray-700">
+                        <li className="flex items-center gap-2">
+                          <Shield className="h-4 w-4 text-purple-600" />
+                          Up to 8 family members
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Gift className="h-4 w-4 text-purple-600" />
+                          Story incentives
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Heart className="h-4 w-4 text-purple-600" />
+                          Add members anytime
+                        </li>
+                      </ul>
+                      <p className="text-3xl font-bold text-gray-900 mb-2">$20<span className="text-lg font-normal text-gray-600">/month</span></p>
+                      <Button 
+                        onClick={() => navigate('/auth?plan=family')}
+                        className="w-full bg-[#8B5CF6] hover:bg-[#7C3AED]"
+                      >
+                        Start Family Legacy
+                      </Button>
+                    </div>
+                    
+                    <div className="bg-white/90 backdrop-blur-sm p-6 rounded-xl border-2 border-purple-400 hover:border-purple-500 transition-all relative overflow-hidden">
+                      <div className="absolute top-3 right-3 bg-purple-600 text-white text-sm px-3 py-1 rounded-full">
+                        Most Popular
+                      </div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-2">Extended Family</h3>
+                      <p className="text-gray-600 mb-4">Perfect for the whole family tree</p>
+                      <ul className="space-y-2 mb-6 text-gray-700">
+                        <li className="flex items-center gap-2">
+                          <Shield className="h-4 w-4 text-purple-600" />
+                          Up to 20 family members
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Gift className="h-4 w-4 text-purple-600" />
+                          Story incentives
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Heart className="h-4 w-4 text-purple-600" />
+                          Add members anytime
+                        </li>
+                      </ul>
+                      <p className="text-3xl font-bold text-gray-900 mb-2">$35<span className="text-lg font-normal text-gray-600">/month</span></p>
+                      <Button 
+                        onClick={() => navigate('/auth?plan=extended')}
+                        className="w-full bg-[#8B5CF6] hover:bg-[#7C3AED]"
+                      >
+                        Start Extended Legacy
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-white/80 text-sm text-center max-w-2xl">
+                    Both plans include the ability to add additional members for $3/month each. 
+                    Invite family members and choose to cover their cost or let them contribute.
+                  </p>
                 </>
               )}
             </div>
@@ -191,16 +242,19 @@ export default function Index() {
           <div className="mt-24 text-center">
             <h2 className="text-3xl font-bold mb-6 text-gray-800">Start Preserving Your Family's Legacy Today</h2>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Don't wait until it's too late. Give your family the gift of preserved memories.
+              Create meaningful connections and preserve precious memories with your loved ones.
             </p>
             {!user && (
-              <Button 
-                size="lg"
-                onClick={() => navigate('/auth')}
-                className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-lg px-8 py-6 transform transition-all hover:scale-105"
-              >
-                Start Your Family's Legacy - $99/year
-              </Button>
+              <div className="flex flex-col items-center gap-4">
+                <Button 
+                  size="lg"
+                  onClick={() => navigate('/auth?plan=family')}
+                  className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-lg px-8 py-6 transform transition-all hover:scale-105"
+                >
+                  Start Your Family's Legacy
+                </Button>
+                <p className="text-gray-600">Plans start at $20/month</p>
+              </div>
             )}
           </div>
 
