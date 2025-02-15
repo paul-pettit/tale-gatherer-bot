@@ -1,4 +1,3 @@
-
 # MemoryStitch Project Charter
 
 ## Project Overview
@@ -22,13 +21,20 @@ MemoryStitch is an AI-powered biographical storytelling platform that conducts t
   - Borders: Soft beige (HSL: 34 33% 80%)
   - Accent: Light beige (HSL: 34 33% 85%)
   - Primary Actions: Warm beige (HSL: 26 60% 85%)
+- Section Backgrounds:
+  - Default Background: Warm beige (bg-background)
+  - Secondary Background: Soft beige (bg-muted)
+  - Card Background: Light beige (bg-card)
+  - Call-to-action Sections: Rich dark brown with overlay
 
 ### Design Principles
-- Warm and inviting color scheme
+- Warm and inviting color scheme throughout the application
+- Consistent use of semantic color tokens (bg-background, bg-card, bg-muted)
 - High contrast for the logo area
-- Consistent use of beige tones throughout the interface
 - Accessible text contrast ratios
 - Responsive design with mobile-friendly navigation
+- Soft shadows and rounded corners for cards and UI elements
+- Gradient overlays for hero sections using brand colors
 
 ## Core Features
 
