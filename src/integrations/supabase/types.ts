@@ -234,6 +234,7 @@ export type Database = {
           created_at: string
           family_id: string
           id: string
+          last_auto_save: string | null
           question_id: string | null
           status: Database["public"]["Enums"]["story_status"] | null
           title: string
@@ -246,6 +247,7 @@ export type Database = {
           created_at?: string
           family_id: string
           id?: string
+          last_auto_save?: string | null
           question_id?: string | null
           status?: Database["public"]["Enums"]["story_status"] | null
           title: string
@@ -258,6 +260,7 @@ export type Database = {
           created_at?: string
           family_id?: string
           id?: string
+          last_auto_save?: string | null
           question_id?: string | null
           status?: Database["public"]["Enums"]["story_status"] | null
           title?: string
