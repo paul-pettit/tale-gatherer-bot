@@ -90,7 +90,7 @@ export default function Index() {
       <div className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Why Choose MemoryStitch?
+            Tell Your Story Well
           </h2>
           <div className="grid md:grid-cols-3 gap-12">
             <div className="text-center">
