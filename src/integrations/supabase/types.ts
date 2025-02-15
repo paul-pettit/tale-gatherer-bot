@@ -311,6 +311,53 @@ export type Database = {
         }
         Relationships: []
       }
+      prompt_logs: {
+        Row: {
+          cost_usd: number
+          created_at: string
+          id: string
+          model: Database["public"]["Enums"]["llm_model"]
+          prompt: string
+          response: string
+          status: string
+          story_id: string | null
+          tokens_used: number
+          user_id: string | null
+        }
+        Insert: {
+          cost_usd: number
+          created_at?: string
+          id?: string
+          model: Database["public"]["Enums"]["llm_model"]
+          prompt: string
+          response: string
+          status: string
+          story_id?: string | null
+          tokens_used: number
+          user_id?: string | null
+        }
+        Update: {
+          cost_usd?: number
+          created_at?: string
+          id?: string
+          model?: Database["public"]["Enums"]["llm_model"]
+          prompt?: string
+          response?: string
+          status?: string
+          story_id?: string | null
+          tokens_used?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_logs_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       question_prompts: {
         Row: {
           category: string
@@ -582,6 +629,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      llm_model: "gpt-4o-mini" | "gpt-4o"
       question_category:
         | "childhood_memories"
         | "life_lessons"

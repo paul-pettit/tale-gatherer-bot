@@ -1,13 +1,13 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, BookOpen, DollarSign, Shield } from "lucide-react";
+import { Users, BookOpen, DollarSign, Shield, Terminal } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { UsersTable } from "@/components/admin/UsersTable";
 import { StoriesTable } from "@/components/admin/StoriesTable";
 import { PaymentsTable } from "@/components/admin/PaymentsTable";
+import { PromptLogsTable } from "@/components/admin/PromptLogsTable";
 
 interface Profile {
   id: string;
@@ -33,12 +33,25 @@ interface Payment {
   profile_id: string;
 }
 
+interface PromptLog {
+  id: string;
+  created_at: string;
+  story_id: string;
+  user_id: string;
+  prompt: string;
+  model: 'gpt-4o-mini' | 'gpt-4o';
+  tokens_used: number;
+  cost_usd: number;
+  status: string;
+}
+
 export default function AdminPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [stories, setStories] = useState<Story[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [promptLogs, setPromptLogs] = useState<PromptLog[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -73,7 +86,7 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     try {
-      const [profilesResult, storiesResult, paymentsResult] = await Promise.all([
+      const [profilesResult, storiesResult, paymentsResult, promptLogsResult] = await Promise.all([
         supabase
           .from('profiles')
           .select('id, full_name, subscription_plan, created_at')
@@ -84,6 +97,10 @@ export default function AdminPage() {
           .order('created_at', { ascending: false }),
         supabase
           .from('payments')
+          .select('*')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('prompt_logs')
           .select('*')
           .order('created_at', { ascending: false }),
       ]);
@@ -102,6 +119,7 @@ export default function AdminPage() {
       }
       if (storiesResult.data) setStories(storiesResult.data);
       if (paymentsResult.data) setPayments(paymentsResult.data);
+      if (promptLogsResult.data) setPromptLogs(promptLogsResult.data);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -144,6 +162,10 @@ export default function AdminPage() {
             <DollarSign className="w-4 h-4 mr-2" />
             Payments
           </TabsTrigger>
+          <TabsTrigger value="prompts" className="flex items-center">
+            <Terminal className="w-4 h-4 mr-2" />
+            Prompts
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
@@ -156,6 +178,10 @@ export default function AdminPage() {
 
         <TabsContent value="payments">
           <PaymentsTable payments={payments} />
+        </TabsContent>
+
+        <TabsContent value="prompts">
+          <PromptLogsTable logs={promptLogs} />
         </TabsContent>
       </Tabs>
     </div>
