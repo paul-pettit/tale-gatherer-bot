@@ -1,69 +1,130 @@
-# Welcome to your Lovable project
 
-## Project info
+# MemoryStitch
 
-**URL**: https://lovable.dev/projects/41a1f11c-d8ca-42cb-bc4c-6b15cee385f3
+MemoryStitch is an AI-powered biographical storytelling platform that helps users preserve and share their life stories through thoughtful interviews and narrative generation.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+### Core Functionality
+- 🤖 AI-powered interview system
+- 📝 Dynamic story generation
+- 👥 Family sharing and collaboration
+- 🔒 Privacy controls and data protection
 
-**Use Lovable**
+### Subscription Tiers
+- **Free Tier**
+  - Single-user personal family
+  - 5 stories per month
+  - Basic story features
+  
+- **Basic Family Plan**
+  - Up to 8 family members
+  - Family story sharing
+  - Collaborative writing
+  - All core features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/41a1f11c-d8ca-42cb-bc4c-6b15cee385f3) and start prompting.
+- **Premium Family Plan**
+  - Up to 20 family members
+  - Priority support
+  - Advanced analytics
+  - Priority AI processing
 
-Changes made via Lovable will be committed automatically to this repo.
+## Tech Stack
 
-**Use your preferred IDE**
+### Frontend
+- React with TypeScript
+- Tailwind CSS for styling
+- shadcn/ui component library
+- Tanstack Query for data fetching
+- React Router for navigation
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Backend (Supabase)
+- PostgreSQL database
+- Row Level Security (RLS)
+- Real-time subscriptions
+- Edge Functions
+- File storage
+- Authentication
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Third-party Integrations
+- OpenAI for AI interviewer
+- Stripe for payments
+- Email verification
 
-Follow these steps:
+## Development
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or Bun package manager
+- Supabase account
+- OpenAI API key
+- Stripe account (for payments)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Environment Variables
+```bash
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+OPENAI_API_KEY=your_openai_api_key
+STRIPE_SECRET_KEY=your_stripe_secret_key
 ```
 
-**Edit a file directly in GitHub**
+### Installation
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd memorystitch
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+2. Install dependencies
+```bash
+npm install
+# or
+bun install
+```
 
-**Use GitHub Codespaces**
+3. Start the development server
+```bash
+npm run dev
+# or
+bun dev
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Project Structure
+```
+src/
+├── components/          # React components
+│   ├── admin/          # Admin dashboard components
+│   ├── auth/           # Authentication components
+│   ├── families/       # Family management components
+│   ├── profile/        # Profile components
+│   ├── stories/        # Story creation components
+│   └── ui/             # Reusable UI components
+├── hooks/              # Custom React hooks
+├── integrations/       # Third-party service integrations
+├── lib/               # Utility functions and helpers
+└── pages/             # Route components
 
-## What technologies are used for this project?
+supabase/
+├── functions/         # Edge Functions
+└── migrations/        # Database migrations
+```
 
-This project is built with .
+## Security
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Row Level Security (RLS) policies protect data access
+- Secure authentication flow with email verification
+- Protected story access based on family membership
+- Data encryption at rest
 
-## How can I deploy this project?
+## Contributing
 
-Simply open [Lovable](https://lovable.dev/projects/41a1f11c-d8ca-42cb-bc4c-6b15cee385f3) and click on Share -> Publish.
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
 
-## I want to use a custom domain - is that possible?
+## License
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+This project is licensed under the MIT License - see the LICENSE file for details.
+
