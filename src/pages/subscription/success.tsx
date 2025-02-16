@@ -4,18 +4,25 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function SubscriptionSuccess() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const sessionId = searchParams.get('session_id');
+  const { user } = useAuth();
 
   useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
     if (!sessionId) {
       toast.error('Invalid session');
       navigate('/subscription');
     }
-  }, [sessionId, navigate]);
+  }, [sessionId, navigate, user]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">

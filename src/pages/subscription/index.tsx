@@ -73,6 +73,8 @@ export default function SubscriptionPage() {
         return;
       }
 
+      setIsLoading(true);
+
       if (tier === 'free') {
         const { error } = await supabase
           .from('profiles')
@@ -85,12 +87,12 @@ export default function SubscriptionPage() {
           .eq('id', user.id);
 
         if (error) throw error;
+        
+        // After successfully setting the free tier, navigate to the home page
         toast.success('Free plan activated successfully!');
         navigate('/');
         return;
       }
-
-      setIsLoading(true);
 
       // Find the correct price for the selected tier and duration
       const selectedPrice = prices?.find(p => p.tier === tier && p.duration === selectedDuration);
