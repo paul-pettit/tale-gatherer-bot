@@ -1,7 +1,7 @@
 
-# MemoryStitch
+# Memory Stitcher
 
-MemoryStitch is an AI-powered biographical storytelling platform that helps users preserve and share their life stories through thoughtful interviews and narrative generation.
+Memory Stitcher is an AI-powered biographical storytelling platform that helps users preserve and share their life stories through thoughtful interviews and narrative generation.
 
 ## Features
 
@@ -72,7 +72,7 @@ STRIPE_SECRET_KEY=your_stripe_secret_key
 1. Clone the repository
 ```bash
 git clone <repository-url>
-cd memorystitch
+cd memorystitcher
 ```
 
 2. Install dependencies
