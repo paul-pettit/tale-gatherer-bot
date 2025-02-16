@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +9,8 @@ import { StoryHeader } from '@/components/stories/StoryHeader';
 import { QuestionCard } from '@/components/stories/QuestionCard';
 import { ChatSession } from '@/components/stories/ChatSession';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 
 interface Question {
   id: string;
@@ -22,9 +23,17 @@ export default function NewStoryPage() {
   const { user } = useAuth();
   const { remainingStories, decrementStoryToken } = useFreeTier();
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const getRandomQuestions = (questions: Question[]) => {
+    return [...questions]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 6);
+  };
 
   useEffect(() => {
     if (!user) {
@@ -52,9 +61,8 @@ export default function NewStoryPage() {
 
         console.log('Questions fetched:', questionsData.length);
         
-        // Randomly select 6 questions
-        const shuffled = questionsData.sort(() => 0.5 - Math.random());
-        setQuestions(shuffled.slice(0, 6));
+        setAllQuestions(questionsData);
+        setQuestions(getRandomQuestions(questionsData));
       } catch (error: any) {
         console.error('Error in initialization:', error);
         toast.error('Failed to initialize page: ' + error.message);
@@ -65,6 +73,13 @@ export default function NewStoryPage() {
 
     initializePage();
   }, [user, navigate]);
+
+  const handleRefreshQuestions = () => {
+    setIsRefreshing(true);
+    const newQuestions = getRandomQuestions(allQuestions);
+    setQuestions(newQuestions);
+    setIsRefreshing(false);
+  };
 
   const handleQuestionSelect = async (question: Question) => {
     if (!user) {
@@ -192,6 +207,15 @@ export default function NewStoryPage() {
                   Choose a prompt below to begin your interview. Each question is designed 
                   to draw out the meaningful moments of your life story.
                 </p>
+                <Button
+                  variant="outline"
+                  onClick={handleRefreshQuestions}
+                  className="mt-6"
+                  disabled={isRefreshing}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  New Set of Questions
+                </Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {questions.map((question) => (
