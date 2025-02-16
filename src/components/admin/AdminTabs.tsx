@@ -1,11 +1,12 @@
 
-import { Users, BookOpen, DollarSign, Terminal, Bot } from "lucide-react";
+import { Users, BookOpen, DollarSign, Terminal, Bot, HelpCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UsersTable } from "./UsersTable";
 import { StoriesTable } from "./StoriesTable";
 import { PaymentsTable } from "./PaymentsTable";
 import { PromptLogsTable } from "./PromptLogsTable";
 import { SystemPromptsTable } from "./SystemPromptsTable";
+import { QuestionsTable } from "./QuestionsTable";
 
 interface AdminTabsProps {
   profiles: any[];
@@ -13,6 +14,7 @@ interface AdminTabsProps {
   payments: any[];
   promptLogs: any[];
   systemPrompts: any[];
+  questions: any[];
 }
 
 export function AdminTabs({
@@ -21,6 +23,7 @@ export function AdminTabs({
   payments,
   promptLogs,
   systemPrompts,
+  questions,
 }: AdminTabsProps) {
   return (
     <Tabs defaultValue="users" className="space-y-6">
@@ -40,6 +43,10 @@ export function AdminTabs({
         <TabsTrigger value="prompts" className="flex items-center">
           <Terminal className="w-4 h-4 mr-2" />
           Prompts
+        </TabsTrigger>
+        <TabsTrigger value="questions" className="flex items-center">
+          <HelpCircle className="w-4 h-4 mr-2" />
+          Questions
         </TabsTrigger>
         <TabsTrigger value="ai" className="flex items-center">
           <Bot className="w-4 h-4 mr-2" />
@@ -61,6 +68,10 @@ export function AdminTabs({
 
       <TabsContent value="prompts">
         <PromptLogsTable logs={promptLogs} />
+      </TabsContent>
+
+      <TabsContent value="questions">
+        <QuestionsTable questions={questions} />
       </TabsContent>
 
       <TabsContent value="ai">

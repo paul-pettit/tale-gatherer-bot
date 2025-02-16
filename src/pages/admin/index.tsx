@@ -11,6 +11,7 @@ export default function AdminPage() {
     payments,
     promptLogs,
     systemPrompts,
+    questions,
     isAdmin,
     loading,
   } = useAdminData();
@@ -27,6 +28,7 @@ export default function AdminPage() {
         payments={payments}
         promptLogs={promptLogs}
         systemPrompts={systemPrompts}
+        questions={questions}
       />
     </AdminLayout>
   );

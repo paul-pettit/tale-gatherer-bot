@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export function useAdminData() {
   const navigate = useNavigate();
@@ -12,6 +12,7 @@ export function useAdminData() {
   const [payments, setPayments] = useState([]);
   const [promptLogs, setPromptLogs] = useState([]);
   const [systemPrompts, setSystemPrompts] = useState([]);
+  const [questions, setQuestions] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +47,14 @@ export function useAdminData() {
 
   const fetchData = async () => {
     try {
-      const [profilesResult, storiesResult, paymentsResult, promptLogsResult, systemPromptsResult] = await Promise.all([
+      const [
+        profilesResult, 
+        storiesResult, 
+        paymentsResult, 
+        promptLogsResult, 
+        systemPromptsResult,
+        questionsResult
+      ] = await Promise.all([
         supabase
           .from('profiles')
           .select('id, full_name, subscription_plan, created_at')
@@ -67,6 +75,10 @@ export function useAdminData() {
           .from('system_prompts')
           .select('*')
           .order('type', { ascending: true }),
+        supabase
+          .from('questions')
+          .select('*')
+          .order('created_at', { ascending: false }),
       ]);
 
       if (profilesResult.data) {
@@ -85,6 +97,7 @@ export function useAdminData() {
       if (paymentsResult.data) setPayments(paymentsResult.data);
       if (promptLogsResult.data) setPromptLogs(promptLogsResult.data);
       if (systemPromptsResult.data) setSystemPrompts(systemPromptsResult.data);
+      if (questionsResult.data) setQuestions(questionsResult.data);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -103,6 +116,7 @@ export function useAdminData() {
     payments,
     promptLogs,
     systemPrompts,
+    questions,
     isAdmin,
     loading,
   };
