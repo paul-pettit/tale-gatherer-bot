@@ -10,13 +10,13 @@ interface ProfileHeaderProps {
 export function ProfileHeader({ avatarUrl, firstName, email }: ProfileHeaderProps) {
   return (
     <div className="flex items-center space-x-4">
-      <Avatar className="h-20 w-20">
+      <Avatar className="h-20 w-20 flex-shrink-0">
         <AvatarImage src={avatarUrl} />
         <AvatarFallback>{firstName?.[0] || email?.[0]}</AvatarFallback>
       </Avatar>
-      <div className="flex flex-col">
-        <h3 className="text-2xl font-semibold">{firstName || "Not set"}</h3>
-        <p className="text-sm text-muted-foreground">
+      <div className="min-w-0 flex-1">
+        <h3 className="text-2xl font-semibold truncate">{firstName || "Not set"}</h3>
+        <p className="text-sm text-muted-foreground truncate" title={email}>
           {email}
         </p>
       </div>
