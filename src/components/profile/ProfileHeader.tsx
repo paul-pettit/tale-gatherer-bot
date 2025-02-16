@@ -1,6 +1,5 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { EllipsisHorizontalIcon } from "lucide-react";
 
 interface ProfileHeaderProps {
   avatarUrl?: string;
