@@ -26,9 +26,9 @@ export function BenefitsSection() {
             <div className="bg-card rounded-lg p-6 h-full shadow-sm flex flex-col">
               <div className="mb-6 flex-shrink-0">
                 <img 
-                  src="/lovable-uploads/95a28528-6720-47e1-aef0-ec4de156b711.png" 
-                  alt="Family enjoying pool time together" 
-                  className="w-full h-48 object-cover rounded-lg"
+                  src="/lovable-uploads/14f2a7aa-5cf8-43f1-94f6-92bb2fbc17e3.png" 
+                  alt="Elderly couple reading together on a bench in autumn" 
+                  className="w-full h-48 object-contain rounded-lg"
                 />
               </div>
               <h3 className="text-xl font-semibold mb-4">Story Incentives</h3>
