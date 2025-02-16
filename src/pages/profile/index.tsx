@@ -22,25 +22,48 @@ export default function ProfilePage() {
   const [hometown, setHometown] = useState("");
   const [gender, setGender] = useState("");
 
-  const { data: profile, refetch } = useQuery({
+  const { data: profileData, refetch } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const { data, error } = await supabase
+
+      // First get the profile
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", user.id)
         .maybeSingle();
 
-      if (error) throw error;
-      
-      // Initialize form values
-      setFirstName(data?.first_name || "");
-      setAge(data?.age?.toString() || "");
-      setHometown(data?.hometown || "");
-      setGender(data?.gender || "");
-      
-      return data;
+      if (profileError) throw profileError;
+
+      // Then get all profile field values
+      const { data: fieldValues, error: fieldValuesError } = await supabase
+        .from("profile_field_values")
+        .select(`
+          value,
+          profile_fields (
+            name
+          )
+        `)
+        .eq("profile_id", user.id);
+
+      if (fieldValuesError) throw fieldValuesError;
+
+      // Map field values to their respective states
+      fieldValues?.forEach((field) => {
+        const fieldName = field.profile_fields?.name;
+        const value = field.value;
+        
+        if (fieldName === 'first_name') setFirstName(value || "");
+        if (fieldName === 'age') setAge(value || "");
+        if (fieldName === 'hometown') setHometown(value || "");
+        if (fieldName === 'gender') setGender(value || "");
+      });
+
+      return {
+        ...profile,
+        fieldValues: fieldValues || []
+      };
     },
     enabled: !!user,
   });
@@ -49,17 +72,33 @@ export default function ProfilePage() {
     if (!user) return;
 
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          first_name: firstName,
-          age: parseInt(age),
-          hometown,
-          gender,
-        })
-        .eq("id", user.id);
+      // Get field IDs first
+      const { data: fields, error: fieldsError } = await supabase
+        .from('profile_fields')
+        .select('id, name')
+        .in('name', ['first_name', 'age', 'hometown', 'gender']);
 
-      if (error) throw error;
+      if (fieldsError) throw fieldsError;
+
+      // Update each field value
+      for (const field of fields || []) {
+        const value = field.name === 'first_name' ? firstName :
+                     field.name === 'age' ? age :
+                     field.name === 'hometown' ? hometown :
+                     field.name === 'gender' ? gender : null;
+
+        const { error } = await supabase
+          .from('profile_field_values')
+          .upsert({
+            profile_id: user.id,
+            field_id: field.id,
+            value: value
+          }, {
+            onConflict: 'profile_id,field_id'
+          });
+
+        if (error) throw error;
+      }
 
       toast.success("Profile updated successfully");
       setIsEditing(false);
@@ -68,6 +107,14 @@ export default function ProfilePage() {
       toast.error("Failed to update profile");
       console.error("Error updating profile:", error);
     }
+  };
+
+  // Get the field value helper function
+  const getFieldValue = (fieldName: string) => {
+    const field = profileData?.fieldValues?.find(
+      (f) => f.profile_fields?.name === fieldName
+    );
+    return field?.value || "Not set";
   };
 
   return (
@@ -79,11 +126,11 @@ export default function ProfilePage() {
         <CardContent className="space-y-6">
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
-              <AvatarImage src={profile?.avatar_url || undefined} />
-              <AvatarFallback>{profile?.first_name?.[0] || user?.email?.[0]}</AvatarFallback>
+              <AvatarImage src={profileData?.avatar_url || undefined} />
+              <AvatarFallback>{getFieldValue('first_name')?.[0] || user?.email?.[0]}</AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="text-2xl font-semibold">{profile?.first_name || "Anonymous User"}</h3>
+              <h3 className="text-2xl font-semibold">{getFieldValue('first_name') || "Anonymous User"}</h3>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
             </div>
           </div>
@@ -145,19 +192,19 @@ export default function ProfilePage() {
             <div className="space-y-4">
               <div>
                 <Label>First Name</Label>
-                <p className="text-sm text-muted-foreground">{profile?.first_name || "Not set"}</p>
+                <p className="text-sm text-muted-foreground">{getFieldValue('first_name') || "Not set"}</p>
               </div>
               <div>
                 <Label>Age</Label>
-                <p className="text-sm text-muted-foreground">{profile?.age || "Not set"}</p>
+                <p className="text-sm text-muted-foreground">{getFieldValue('age') || "Not set"}</p>
               </div>
               <div>
                 <Label>Hometown</Label>
-                <p className="text-sm text-muted-foreground">{profile?.hometown || "Not set"}</p>
+                <p className="text-sm text-muted-foreground">{getFieldValue('hometown') || "Not set"}</p>
               </div>
               <div>
                 <Label>Gender</Label>
-                <p className="text-sm text-muted-foreground">{profile?.gender || "Not set"}</p>
+                <p className="text-sm text-muted-foreground">{getFieldValue('gender') || "Not set"}</p>
               </div>
               <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
             </div>
@@ -173,7 +220,7 @@ export default function ProfilePage() {
           <div>
             <h4 className="font-medium">Current Plan</h4>
             <p className="text-sm text-muted-foreground">
-              {isFreeTier ? "Free Tier" : profile?.subscription_plan?.toUpperCase()}
+              {isFreeTier ? "Free Tier" : profileData?.subscription_plan?.toUpperCase()}
             </p>
           </div>
           <Separator />
@@ -183,13 +230,13 @@ export default function ProfilePage() {
               {remainingStories} {remainingStories === 1 ? "story" : "stories"} remaining
             </p>
           </div>
-          {profile?.subscription_end_date && (
+          {profileData?.subscription_end_date && (
             <>
               <Separator />
               <div>
                 <h4 className="font-medium">Subscription Ends</h4>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(profile.subscription_end_date).toLocaleDateString()}
+                  {new Date(profileData.subscription_end_date).toLocaleDateString()}
                 </p>
               </div>
             </>
