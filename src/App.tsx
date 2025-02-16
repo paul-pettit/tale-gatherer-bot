@@ -10,6 +10,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import AuthPage from "./pages/auth";
 import VerificationPendingPage from "./pages/auth/verification-pending";
+import VerificationSuccessPage from "./pages/auth/verification-success";
 import OnboardingPage from "./pages/onboarding";
 import SubscriptionPage from "./pages/subscription";
 import SubscriptionSuccess from "./pages/subscription/success";
@@ -32,6 +33,7 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/auth/verification-pending" element={<VerificationPendingPage />} />
+            <Route path="/auth/verification-success" element={<VerificationSuccessPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/subscription" element={<SubscriptionPage />} />
             <Route path="/subscription/success" element={<SubscriptionSuccess />} />
