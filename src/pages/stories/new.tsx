@@ -51,9 +51,9 @@ export default function NewStoryPage() {
 
         console.log('Questions fetched:', questionsData.length);
         
-        // Randomly select 3 questions
+        // Randomly select 6 questions
         const shuffled = questionsData.sort(() => 0.5 - Math.random());
-        setQuestions(shuffled.slice(0, 3));
+        setQuestions(shuffled.slice(0, 6));
       } catch (error: any) {
         console.error('Error in initialization:', error);
         toast.error('Failed to initialize page: ' + error.message);
@@ -159,28 +159,43 @@ export default function NewStoryPage() {
   };
 
   if (isLoading) {
-    return <div>Loading questions...</div>;
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card>
+          <CardContent className="p-8">
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="animate-pulse text-lg text-muted-foreground">
+                Loading story prompts...
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       <Card>
         <StoryHeader 
           remainingStories={remainingStories}
           lastSaved={null}
         />
-        <CardContent>
+        <CardContent className="p-8">
           {!selectedQuestion ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {questions.map((question) => (
-                <QuestionCard
-                  key={question.id}
-                  category={question.category}
-                  question={question.question}
-                  onSelect={() => handleQuestionSelect(question)}
-                />
-              ))}
-            </div>
+            <>
+              <h2 className="text-3xl font-bold text-center mb-8">Choose Your Story Prompt</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {questions.map((question) => (
+                  <QuestionCard
+                    key={question.id}
+                    category={question.category}
+                    question={question.question}
+                    onSelect={() => handleQuestionSelect(question)}
+                  />
+                ))}
+              </div>
+            </>
           ) : chatSessionId ? (
             <ChatSession
               sessionId={chatSessionId}
