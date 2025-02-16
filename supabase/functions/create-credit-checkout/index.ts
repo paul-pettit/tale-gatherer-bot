@@ -91,11 +91,38 @@ serve(async (req: Request) => {
       .eq('id', packageId)
       .single();
 
-    console.log('Credit package lookup:', { creditPackage, error: packageError });
+    console.log('Credit package lookup:', { 
+      creditPackage, 
+      error: packageError,
+      stripe_price_id: creditPackage?.stripe_price_id 
+    });
 
     if (packageError || !creditPackage) {
       console.error('Package error:', packageError);
       throw new Error('Failed to fetch credit package');
+    }
+
+    // Validate Stripe price ID
+    if (!creditPackage.stripe_price_id) {
+      throw new Error('Credit package is missing Stripe price ID');
+    }
+
+    try {
+      // Verify the price exists in Stripe
+      const price = await stripe.prices.retrieve(creditPackage.stripe_price_id);
+      console.log('Stripe price verification:', { 
+        price_id: price.id,
+        active: price.active,
+        currency: price.currency,
+        unit_amount: price.unit_amount
+      });
+
+      if (!price.active) {
+        throw new Error('Stripe price is inactive');
+      }
+    } catch (error) {
+      console.error('Stripe price verification error:', error);
+      throw new Error('Invalid or inactive Stripe price');
     }
 
     // Get or create Stripe customer
@@ -219,4 +246,3 @@ serve(async (req: Request) => {
     );
   }
 });
-
