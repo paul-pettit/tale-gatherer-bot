@@ -24,6 +24,13 @@ export function BenefitsSection() {
           </div>
           <div className="text-center">
             <div className="bg-card rounded-lg p-6 h-full shadow-sm">
+              <div className="mb-6">
+                <img 
+                  src="/lovable-uploads/d84bef9b-1d17-4006-9b0d-2fad44d91efa.png" 
+                  alt="Illustration of people giving thumbs up with a coffee cup" 
+                  className="w-full h-auto rounded-lg mb-4"
+                />
+              </div>
               <h3 className="text-xl font-semibold mb-4">Story Incentives</h3>
               <p className="text-muted-foreground">
                 Encourage storytelling through gift card contributions and family rewards.
