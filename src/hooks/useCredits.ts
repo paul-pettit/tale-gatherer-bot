@@ -43,12 +43,17 @@ export function useCredits() {
       if (!session) {
         throw new Error('No active session found');
       }
+
+      // Using a separate variable for the request body for better logging
+      const requestBody = {
+        packageId,
+        userId: user.id,
+      };
+      
+      console.log('Sending request with body:', requestBody);
       
       const { data, error } = await supabase.functions.invoke<{ url: string; error?: string }>('create-credit-checkout', {
-        body: {
-          packageId,
-          userId: user.id,
-        },
+        body: JSON.stringify(requestBody),
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
