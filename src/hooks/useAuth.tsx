@@ -26,9 +26,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
 
-      // If the user just confirmed their email, redirect to verification success
+      // If the user just confirmed their email, redirect to onboarding
       if (currentUser?.email_confirmed_at && window.location.pathname === '/auth/verification-pending') {
-        window.location.href = '/auth/verification-success';
+        window.location.href = '/onboarding';
       }
 
       setLoading(false);

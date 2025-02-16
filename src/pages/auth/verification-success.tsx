@@ -2,16 +2,16 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, ArrowRight } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 export default function VerificationSuccessPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect to profile page after 3 seconds
+    // Redirect to onboarding page after 3 seconds
     const timeout = setTimeout(() => {
-      navigate('/profile');
+      navigate('/onboarding');
     }, 3000);
 
     return () => clearTimeout(timeout);
@@ -26,15 +26,15 @@ export default function VerificationSuccessPage() {
           </div>
           <CardTitle className="text-2xl mb-2">Email Verified!</CardTitle>
           <CardDescription className="text-lg">
-            Your email has been successfully verified. You'll be redirected to your profile page shortly.
+            Your email has been successfully verified. Let's set up your profile.
           </CardDescription>
         </CardHeader>
         <CardFooter className="flex justify-center">
           <Button
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate('/onboarding')}
             className="mt-2"
           >
-            Go to Profile
+            Continue to Setup
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </CardFooter>
