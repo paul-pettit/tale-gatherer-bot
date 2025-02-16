@@ -21,7 +21,7 @@ serve(async (req: Request) => {
     })
 
     // Get the request body
-    const { tier, duration, userId, priceId } = await req.json()
+    const { priceId, userId, mode = 'payment' } = await req.json()
 
     // Create Supabase client
     const supabaseClient = createClient(
@@ -66,6 +66,17 @@ serve(async (req: Request) => {
         .eq('id', userId)
     }
 
+    // Get the credit package details
+    const { data: creditPackage, error: packageError } = await supabaseClient
+      .from('credit_packages')
+      .select('*')
+      .eq('stripe_price_id', priceId)
+      .single()
+
+    if (packageError || !creditPackage) {
+      throw new Error('Credit package not found')
+    }
+
     // Create a checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -75,13 +86,13 @@ serve(async (req: Request) => {
           quantity: 1,
         },
       ],
-      mode: 'subscription',
-      success_url: `${req.headers.get('origin')}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get('origin')}/subscription`,
+      mode: 'payment',
+      success_url: `${req.headers.get('origin')}/credits/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get('origin')}/credits`,
       metadata: {
         user_id: userId,
-        tier,
-        duration,
+        package_id: creditPackage.id,
+        credits: creditPackage.credits.toString(),
       },
     })
 
