@@ -189,8 +189,12 @@ export function AvatarUpload({
   return (
     <div className="space-y-4">
       <div className="relative group">
-        <Avatar className={sizeClasses[size]}>
-          <AvatarImage src={avatarUrl} />
+        <Avatar className={`${sizeClasses[size]} overflow-hidden`}>
+          <AvatarImage 
+            src={avatarUrl} 
+            className="object-cover w-full h-full"
+            style={{ objectFit: 'cover' }}
+          />
           <AvatarFallback>{fallback}</AvatarFallback>
         </Avatar>
 
