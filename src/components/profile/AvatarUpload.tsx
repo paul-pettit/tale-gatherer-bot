@@ -39,10 +39,10 @@ export function AvatarUpload({
   const [imgSrc, setImgSrc] = useState('');
   const [crop, setCrop] = useState<Crop>({
     unit: '%',
-    width: 50,
-    height: 50,
-    x: 25,
-    y: 25
+    width: 90,
+    height: 90,
+    x: 5,
+    y: 5
   });
   const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
 
@@ -86,22 +86,20 @@ export function AvatarUpload({
       throw new Error('No 2d context');
     }
 
-    const size = Math.min(crop.width, crop.height);
-    canvas.width = size;
-    canvas.height = size;
-
-    const cropX = (crop.x * image.width * scaleX) / 100;
-    const cropY = (crop.y * image.height * scaleY) / 100;
     const cropWidth = (crop.width * image.width * scaleX) / 100;
     const cropHeight = (crop.height * image.height * scaleY) / 100;
+    const size = Math.min(cropWidth, cropHeight);
 
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    canvas.width = size;
+    canvas.height = size;
 
     ctx.beginPath();
     ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2, true);
     ctx.closePath();
     ctx.clip();
+
+    const cropX = (crop.x * image.width * scaleX) / 100;
+    const cropY = (crop.y * image.height * scaleY) / 100;
 
     ctx.drawImage(
       image,
@@ -198,10 +196,6 @@ export function AvatarUpload({
           <AvatarImage 
             src={avatarUrl} 
             className="h-full w-full"
-            style={{ 
-              objectFit: 'cover',
-              borderRadius: '50%'
-            }}
           />
           <AvatarFallback>{fallback}</AvatarFallback>
         </Avatar>
@@ -285,14 +279,13 @@ export function AvatarUpload({
                 onChange={(_, percentCrop) => setCrop(percentCrop)}
                 aspect={1}
                 circularCrop
-                className="max-h-[400px] object-contain mx-auto"
+                className="max-w-full mx-auto"
               >
                 <img
                   ref={(e) => setImageRef(e)}
                   src={imgSrc}
                   alt="Crop me"
-                  className="max-h-[400px] w-auto mx-auto"
-                  style={{ maxWidth: '100%' }}
+                  className="max-w-full h-auto mx-auto"
                 />
               </ReactCrop>
             )}
