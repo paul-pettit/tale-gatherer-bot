@@ -3,15 +3,13 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useFreeTier } from "@/hooks/useFreeTier";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { ProfileHeader } from "@/components/profile/ProfileHeader";
+import { ProfileForm } from "@/components/profile/ProfileForm";
+import { ProfileInfo } from "@/components/profile/ProfileInfo";
+import { SubscriptionDetails } from "@/components/profile/SubscriptionDetails";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -27,7 +25,6 @@ export default function ProfilePage() {
     queryFn: async () => {
       if (!user) return null;
 
-      // First get the profile
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
@@ -36,7 +33,6 @@ export default function ProfilePage() {
 
       if (profileError) throw profileError;
 
-      // Then get all profile field values
       const { data: fieldValues, error: fieldValuesError } = await supabase
         .from("profile_field_values")
         .select(`
@@ -49,7 +45,6 @@ export default function ProfilePage() {
 
       if (fieldValuesError) throw fieldValuesError;
 
-      // Map field values to their respective states
       fieldValues?.forEach((field) => {
         const fieldName = field.profile_fields?.name;
         const value = field.value;
@@ -72,7 +67,6 @@ export default function ProfilePage() {
     if (!user) return;
 
     try {
-      // Get field IDs first
       const { data: fields, error: fieldsError } = await supabase
         .from('profile_fields')
         .select('id, name')
@@ -80,7 +74,6 @@ export default function ProfilePage() {
 
       if (fieldsError) throw fieldsError;
 
-      // Update each field value
       for (const field of fields || []) {
         const value = field.name === 'first_name' ? firstName :
                      field.name === 'age' ? age :
@@ -109,7 +102,6 @@ export default function ProfilePage() {
     }
   };
 
-  // Get the field value helper function
   const getFieldValue = (fieldName: string) => {
     const field = profileData?.fieldValues?.find(
       (f) => f.profile_fields?.name === fieldName
@@ -124,125 +116,43 @@ export default function ProfilePage() {
           <CardTitle>Profile</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex items-center space-x-4">
-            <Avatar className="h-20 w-20">
-              <AvatarImage src={profileData?.avatar_url || undefined} />
-              <AvatarFallback>{getFieldValue('first_name')?.[0] || user?.email?.[0]}</AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className="text-2xl font-semibold">{getFieldValue('first_name') || "Anonymous User"}</h3>
-              <p className="text-sm text-muted-foreground">{user?.email}</p>
-            </div>
-          </div>
+          <ProfileHeader
+            avatarUrl={profileData?.avatar_url}
+            firstName={getFieldValue('first_name')}
+            email={user?.email}
+          />
 
           {isEditing ? (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="Enter your first name"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="age">Age</Label>
-                <Input
-                  id="age"
-                  type="number"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  placeholder="Enter your age"
-                  min="0"
-                  max="120"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="hometown">Hometown</Label>
-                <Input
-                  id="hometown"
-                  value={hometown}
-                  onChange={(e) => setHometown(e.target.value)}
-                  placeholder="Enter your hometown"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="gender">Gender</Label>
-                <Select value={gender} onValueChange={setGender}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="non-binary">Non-binary</SelectItem>
-                    <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex space-x-2">
-                <Button onClick={handleSave}>Save Changes</Button>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
-                  Cancel
-                </Button>
-              </div>
-            </div>
+            <ProfileForm
+              firstName={firstName}
+              age={age}
+              hometown={hometown}
+              gender={gender}
+              onFirstNameChange={setFirstName}
+              onAgeChange={setAge}
+              onHometownChange={setHometown}
+              onGenderChange={setGender}
+              onSave={handleSave}
+              onCancel={() => setIsEditing(false)}
+            />
           ) : (
-            <div className="space-y-4">
-              <div>
-                <Label>First Name</Label>
-                <p className="text-sm text-muted-foreground">{getFieldValue('first_name') || "Not set"}</p>
-              </div>
-              <div>
-                <Label>Age</Label>
-                <p className="text-sm text-muted-foreground">{getFieldValue('age') || "Not set"}</p>
-              </div>
-              <div>
-                <Label>Hometown</Label>
-                <p className="text-sm text-muted-foreground">{getFieldValue('hometown') || "Not set"}</p>
-              </div>
-              <div>
-                <Label>Gender</Label>
-                <p className="text-sm text-muted-foreground">{getFieldValue('gender') || "Not set"}</p>
-              </div>
-              <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
-            </div>
+            <ProfileInfo
+              firstName={getFieldValue('first_name')}
+              age={getFieldValue('age')}
+              hometown={getFieldValue('hometown')}
+              gender={getFieldValue('gender')}
+              onEdit={() => setIsEditing(true)}
+            />
           )}
         </CardContent>
       </Card>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Subscription Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h4 className="font-medium">Current Plan</h4>
-            <p className="text-sm text-muted-foreground">
-              {isFreeTier ? "Free Tier" : profileData?.subscription_plan?.toUpperCase()}
-            </p>
-          </div>
-          <Separator />
-          <div>
-            <h4 className="font-medium">Story Credits</h4>
-            <p className="text-sm text-muted-foreground">
-              {remainingStories} {remainingStories === 1 ? "story" : "stories"} remaining
-            </p>
-          </div>
-          {profileData?.subscription_end_date && (
-            <>
-              <Separator />
-              <div>
-                <h4 className="font-medium">Subscription Ends</h4>
-                <p className="text-sm text-muted-foreground">
-                  {new Date(profileData.subscription_end_date).toLocaleDateString()}
-                </p>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+      <SubscriptionDetails
+        isFreeTier={isFreeTier}
+        subscriptionPlan={profileData?.subscription_plan}
+        remainingStories={remainingStories}
+        subscriptionEndDate={profileData?.subscription_end_date}
+      />
     </div>
   );
 }
