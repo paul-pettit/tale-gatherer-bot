@@ -35,20 +35,18 @@ export function useCredits() {
       console.log('Starting purchase process for package:', packageId);
       console.log('User ID:', user.id);
       
-      const { data, error } = await supabase.functions.invoke<{ url: string; error?: string }>('create-credit-checkout', {
+      const { data, error: functionError } = await supabase.functions.invoke<{ url: string; error?: string }>('create-credit-checkout', {
         body: {
           packageId,
           userId: user.id,
         },
       });
 
-      // Handle edge function error response
-      if (error) {
-        console.error('Edge function error:', error);
-        throw new Error(error.message || 'Failed to initiate purchase');
+      if (functionError) {
+        console.error('Edge function error:', functionError);
+        throw new Error(functionError.message || 'Failed to initiate purchase');
       }
 
-      // Handle application error from the edge function
       if (data?.error) {
         console.error('Application error:', data.error);
         throw new Error(data.error);

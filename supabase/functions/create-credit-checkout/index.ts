@@ -65,6 +65,7 @@ serve(async (req: Request) => {
       .single();
 
     if (packageError) {
+      console.error('Credit package error:', packageError);
       throw new Error(`Failed to fetch credit package: ${packageError.message}`);
     }
 
@@ -80,6 +81,7 @@ serve(async (req: Request) => {
       .single();
 
     if (profileError) {
+      console.error('Profile error:', profileError);
       throw new Error(`Failed to fetch profile: ${profileError.message}`);
     }
 
@@ -89,9 +91,11 @@ serve(async (req: Request) => {
       const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
       
       if (userError || !userData.user) {
+        console.error('User data error:', userError);
         throw new Error(`Failed to fetch user data: ${userError?.message || 'User not found'}`);
       }
 
+      console.log('Creating new Stripe customer for user:', userData.user.email);
       const customer = await stripe.customers.create({
         email: userData.user.email,
         metadata: { userId },
@@ -99,12 +103,19 @@ serve(async (req: Request) => {
 
       customerId = customer.id;
 
-      await supabaseAdmin
+      // Update profile with Stripe customer ID
+      const { error: updateError } = await supabaseAdmin
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', userId);
+
+      if (updateError) {
+        console.error('Profile update error:', updateError);
+        throw new Error(`Failed to update profile with customer ID: ${updateError.message}`);
+      }
     }
 
+    console.log('Creating credit purchase record...');
     // Create a new credit purchase record
     const { data: purchase, error: purchaseError } = await supabaseAdmin
       .from('credit_purchases')
@@ -119,9 +130,11 @@ serve(async (req: Request) => {
       .single();
 
     if (purchaseError) {
+      console.error('Purchase creation error:', purchaseError);
       throw new Error(`Failed to create purchase record: ${purchaseError.message}`);
     }
 
+    console.log('Creating Stripe checkout session...');
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -140,11 +153,17 @@ serve(async (req: Request) => {
     });
 
     // Update purchase record with session ID
-    await supabaseAdmin
+    const { error: sessionUpdateError } = await supabaseAdmin
       .from('credit_purchases')
       .update({ stripe_session_id: session.id })
       .eq('id', purchase.id);
 
+    if (sessionUpdateError) {
+      console.error('Session update error:', sessionUpdateError);
+      throw new Error(`Failed to update purchase with session ID: ${sessionUpdateError.message}`);
+    }
+
+    console.log('Checkout session created successfully:', session.id);
     return new Response(
       JSON.stringify({ url: session.url }),
       {
