@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useFreeTier } from "@/hooks/useFreeTier";
@@ -10,6 +11,7 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { SubscriptionDetails } from "@/components/profile/SubscriptionDetails";
 import { PasswordSection } from "@/components/profile/PasswordSection";
+import { CreditsPurchaseCard } from "@/components/profile/CreditsPurchaseCard";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -155,6 +157,8 @@ export default function ProfilePage() {
             firstName={getFieldValue('first_name')}
             email={user?.email}
             onAvatarChange={handleAvatarChange}
+            remainingStories={remainingStories}
+            subscriptionPlan={profileData?.subscription_plan || 'free'}
           />
 
           {isEditing ? (
@@ -183,8 +187,8 @@ export default function ProfilePage() {
       </Card>
 
       <div className="space-y-6">
+        <CreditsPurchaseCard />
         <PasswordSection />
-        
         <SubscriptionDetails
           isFreeTier={isFreeTier}
           subscriptionPlan={profileData?.subscription_plan}
