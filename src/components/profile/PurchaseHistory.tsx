@@ -86,7 +86,7 @@ export function PurchaseHistory() {
                     ${purchase.amount.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Badge variant={purchase.status === 'completed' ? 'success' : 'secondary'}>
+                    <Badge variant={purchase.status === 'completed' ? 'default' : 'secondary'}>
                       {purchase.status}
                     </Badge>
                   </TableCell>
