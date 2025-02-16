@@ -39,6 +39,13 @@ export function BenefitsSection() {
           </div>
           <div className="text-center">
             <div className="bg-card rounded-lg p-6 h-full shadow-sm flex flex-col">
+              <div className="mb-6 flex-shrink-0">
+                <img 
+                  src="/lovable-uploads/d31cdefd-326f-492c-b5be-a71ce6f4bcba.png" 
+                  alt="Family protected under a secure roof" 
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+              </div>
               <h3 className="text-xl font-semibold mb-4">Private & Secure</h3>
               <p className="text-muted-foreground">
                 Control who sees your stories with flexible privacy settings for family sharing.
