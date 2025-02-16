@@ -1,4 +1,6 @@
 
+import { Users, BadgeDollarSign, BadgeCheck } from "lucide-react";
+
 export function BenefitsSection() {
   return (
     <div className="py-24 bg-background">
@@ -16,7 +18,10 @@ export function BenefitsSection() {
                   className="w-full h-48 object-cover rounded-lg"
                 />
               </div>
-              <h3 className="text-xl font-semibold mb-4">Collaborative Storytelling</h3>
+              <h3 className="text-xl font-semibold mb-4 flex items-center justify-center gap-2">
+                <Users className="h-5 w-5 text-muted-foreground" />
+                Collaborative Storytelling
+              </h3>
               <p className="text-muted-foreground">
                 Multiple family members can contribute to the same story, adding their unique perspectives.
               </p>
@@ -31,7 +36,10 @@ export function BenefitsSection() {
                   className="w-full h-48 object-contain rounded-lg"
                 />
               </div>
-              <h3 className="text-xl font-semibold mb-4">Story Incentives</h3>
+              <h3 className="text-xl font-semibold mb-4 flex items-center justify-center gap-2">
+                <BadgeDollarSign className="h-5 w-5 text-muted-foreground" />
+                Story Incentives
+              </h3>
               <p className="text-muted-foreground">
                 Encourage storytelling through gift card contributions and family rewards.
               </p>
@@ -46,7 +54,10 @@ export function BenefitsSection() {
                   className="w-full h-48 object-cover rounded-lg"
                 />
               </div>
-              <h3 className="text-xl font-semibold mb-4">Private & Secure</h3>
+              <h3 className="text-xl font-semibold mb-4 flex items-center justify-center gap-2">
+                <BadgeCheck className="h-5 w-5 text-muted-foreground" />
+                Private & Secure
+              </h3>
               <p className="text-muted-foreground">
                 Control who sees your stories with flexible privacy settings for family sharing.
               </p>
