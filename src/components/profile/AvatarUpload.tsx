@@ -39,10 +39,10 @@ export function AvatarUpload({
   const [imgSrc, setImgSrc] = useState('');
   const [crop, setCrop] = useState<Crop>({
     unit: '%',
-    width: 100,
-    height: 100,
-    x: 0,
-    y: 0
+    width: 50,
+    height: 50,
+    x: 25,
+    y: 25
   });
   const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
 
@@ -56,13 +56,11 @@ export function AvatarUpload({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       toast.error('Please upload an image file');
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error('File size must be less than 5MB');
       return;
@@ -88,13 +86,22 @@ export function AvatarUpload({
       throw new Error('No 2d context');
     }
 
+    const size = Math.min(crop.width, crop.height);
+    canvas.width = size;
+    canvas.height = size;
+
     const cropX = (crop.x * image.width * scaleX) / 100;
     const cropY = (crop.y * image.height * scaleY) / 100;
     const cropWidth = (crop.width * image.width * scaleX) / 100;
     const cropHeight = (crop.height * image.height * scaleY) / 100;
 
-    canvas.width = cropWidth;
-    canvas.height = cropHeight;
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.clip();
 
     ctx.drawImage(
       image,
@@ -104,15 +111,15 @@ export function AvatarUpload({
       cropHeight,
       0,
       0,
-      cropWidth,
-      cropHeight
+      size,
+      size
     );
 
     return new Promise((resolve) => {
       canvas.toBlob((blob) => {
         if (!blob) throw new Error('Canvas is empty');
         resolve(blob);
-      }, 'image/jpeg', 0.95);
+      }, 'image/jpeg', 1);
     });
   };
 
@@ -126,7 +133,6 @@ export function AvatarUpload({
         type: 'image/jpeg',
       });
 
-      // Delete existing avatar if there is one
       if (avatarUrl) {
         const oldAvatarPath = avatarUrl.split('/').pop();
         if (oldAvatarPath) {
@@ -136,7 +142,6 @@ export function AvatarUpload({
         }
       }
 
-      // Upload new avatar
       const fileExt = 'jpg';
       const filePath = `${userId}/${crypto.randomUUID()}.${fileExt}`;
 
@@ -192,8 +197,11 @@ export function AvatarUpload({
         <Avatar className={`${sizeClasses[size]} overflow-hidden`}>
           <AvatarImage 
             src={avatarUrl} 
-            className="object-cover w-full h-full"
-            style={{ objectFit: 'cover' }}
+            className="h-full w-full"
+            style={{ 
+              objectFit: 'cover',
+              borderRadius: '50%'
+            }}
           />
           <AvatarFallback>{fallback}</AvatarFallback>
         </Avatar>
@@ -277,13 +285,14 @@ export function AvatarUpload({
                 onChange={(_, percentCrop) => setCrop(percentCrop)}
                 aspect={1}
                 circularCrop
-                className="max-h-[400px] object-contain"
+                className="max-h-[400px] object-contain mx-auto"
               >
                 <img
                   ref={(e) => setImageRef(e)}
                   src={imgSrc}
                   alt="Crop me"
-                  className="max-h-[400px] w-auto"
+                  className="max-h-[400px] w-auto mx-auto"
+                  style={{ maxWidth: '100%' }}
                 />
               </ReactCrop>
             )}
