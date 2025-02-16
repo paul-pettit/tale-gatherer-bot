@@ -20,6 +20,8 @@ import FamilyDetailsPage from "./pages/families/[id]";
 import NewStoryPage from "./pages/stories/new";
 import ProfilePage from "./pages/profile";
 import AdminPage from "./pages/admin";
+import CreditsPage from "./pages/credits";
+import CreditsPurchaseSuccess from "./pages/credits/success";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +49,8 @@ const App = () => (
                     <Route path="/families/:id" element={<FamilyDetailsPage />} />
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/admin" element={<AdminPage />} />
+                    <Route path="/credits" element={<CreditsPage />} />
+                    <Route path="/credits/success" element={<CreditsPurchaseSuccess />} />
                     <Route
                       path="/stories/new"
                       element={
