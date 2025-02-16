@@ -35,7 +35,6 @@ export function useCredits() {
         body: {
           priceId,
           userId: user.id,
-          mode: 'payment'
         },
       });
 
