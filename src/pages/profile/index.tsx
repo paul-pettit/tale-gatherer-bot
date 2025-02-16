@@ -10,6 +10,7 @@ import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { SubscriptionDetails } from "@/components/profile/SubscriptionDetails";
+import { PasswordSection } from "@/components/profile/PasswordSection";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -147,12 +148,16 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
 
-      <SubscriptionDetails
-        isFreeTier={isFreeTier}
-        subscriptionPlan={profileData?.subscription_plan}
-        remainingStories={remainingStories}
-        subscriptionEndDate={profileData?.subscription_end_date}
-      />
+      <div className="space-y-6">
+        <PasswordSection />
+        
+        <SubscriptionDetails
+          isFreeTier={isFreeTier}
+          subscriptionPlan={profileData?.subscription_plan}
+          remainingStories={remainingStories}
+          subscriptionEndDate={profileData?.subscription_end_date}
+        />
+      </div>
     </div>
   );
 }
