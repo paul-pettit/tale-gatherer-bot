@@ -39,7 +39,7 @@ export function SubscriptionDetails({
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => navigate('/subscription')}
+              onClick={() => navigate('/credits')}
               className="text-xs"
             >
               Purchase Credits
