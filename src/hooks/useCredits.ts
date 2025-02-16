@@ -37,7 +37,7 @@ export function useCredits() {
         userId: user.id,
       });
       
-      const response = await supabase.functions.invoke<{ url: string; error?: string }>('create-credit-checkout', {
+      const { data, error } = await supabase.functions.invoke<{ url: string; error?: string }>('create-credit-checkout', {
         body: {
           packageId,
           userId: user.id,
@@ -47,37 +47,24 @@ export function useCredits() {
         },
       });
 
-      console.log('Edge function response:', response);
+      console.log('Edge function response:', { data, error });
 
-      if (response.error) {
-        console.error('Edge function error:', {
-          error: response.error,
-          data: response.data,
-        });
-        
-        // Try to extract the most useful error message
-        const errorMessage = response.error.message || 
-          (response.data?.error ? 
-            typeof response.data.error === 'string' ? 
-              response.data.error : 
-              JSON.stringify(response.data.error)
-          ) : 'Failed to initiate purchase';
-        
-        throw new Error(errorMessage);
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Failed to initiate purchase');
       }
 
-      if (!response.data?.url) {
-        console.error('Missing checkout URL in response:', response);
+      if (!data?.url) {
+        console.error('Missing checkout URL in response:', data);
         throw new Error('No checkout URL received from Stripe');
       }
 
       // Redirect to Stripe checkout
-      window.location.href = response.data.url;
+      window.location.href = data.url;
     } catch (error: any) {
       console.error('Purchase error:', {
         error,
         message: error.message,
-        stack: error.stack,
       });
       
       toast.error(error.message || 'Failed to initiate purchase. Please try again.');
