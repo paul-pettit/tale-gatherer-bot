@@ -42,20 +42,26 @@ export function useCredits() {
         },
       });
 
-      if (error || data?.error) {
-        console.error('Error response:', error || data?.error);
-        throw new Error(error?.message || data?.error || 'Failed to initiate purchase');
+      // Handle edge function error response
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Failed to initiate purchase');
       }
 
-      console.log('Successfully received response:', data);
+      // Handle application error from the edge function
+      if (data?.error) {
+        console.error('Application error:', data.error);
+        throw new Error(data.error);
+      }
 
       if (!data?.url) {
         throw new Error('No checkout URL received from Stripe');
       }
 
+      // Redirect to Stripe checkout
       window.location.href = data.url;
     } catch (error: any) {
-      console.error('Full error object:', error);
+      console.error('Purchase error:', error);
       toast.error(error.message || 'Failed to initiate purchase. Please try again.');
     } finally {
       setIsLoading(false);
