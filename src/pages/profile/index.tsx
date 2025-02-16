@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useFreeTier } from "@/hooks/useFreeTier";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,20 +32,40 @@ export default function ProfilePage() {
         .eq("id", user.id)
         .maybeSingle();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Profile fetch error:", profileError);
+        throw profileError;
+      }
 
+      // Fetch field definitions first
+      const { data: fields, error: fieldsError } = await supabase
+        .from("profile_fields")
+        .select("id, name")
+        .in("name", ["first_name", "age", "hometown", "gender"]);
+
+      if (fieldsError) {
+        console.error("Fields fetch error:", fieldsError);
+        throw fieldsError;
+      }
+
+      // Then fetch values for these fields
       const { data: fieldValues, error: fieldValuesError } = await supabase
         .from("profile_field_values")
         .select(`
           value,
+          field_id,
           profile_fields (
             name
           )
         `)
         .eq("profile_id", user.id);
 
-      if (fieldValuesError) throw fieldValuesError;
+      if (fieldValuesError) {
+        console.error("Field values fetch error:", fieldValuesError);
+        throw fieldValuesError;
+      }
 
+      // Update state with values
       fieldValues?.forEach((field) => {
         const fieldName = field.profile_fields?.name;
         const value = field.value;
@@ -58,51 +78,43 @@ export default function ProfilePage() {
 
       return {
         ...profile,
-        fieldValues: fieldValues || []
+        fieldValues,
+        fields
       };
     },
     enabled: !!user,
   });
 
   const handleSave = async () => {
-    if (!user) return;
+    if (!user || !profileData?.fields) return;
 
     try {
-      // First get all the field IDs
-      const { data: fields, error: fieldsError } = await supabase
-        .from('profile_fields')
-        .select('id, name')
-        .in('name', ['first_name', 'age', 'hometown', 'gender']);
+      const updates = profileData.fields.map(field => ({
+        profile_id: user.id,
+        field_id: field.id,
+        value: field.name === 'first_name' ? firstName :
+               field.name === 'age' ? age :
+               field.name === 'hometown' ? hometown :
+               field.name === 'gender' ? gender : ''
+      }));
 
-      if (fieldsError) throw fieldsError;
+      const { error } = await supabase
+        .from('profile_field_values')
+        .upsert(updates, {
+          onConflict: 'profile_id,field_id'
+        });
 
-      for (const field of fields || []) {
-        const value = field.name === 'first_name' ? firstName :
-                     field.name === 'age' ? age :
-                     field.name === 'hometown' ? hometown :
-                     field.name === 'gender' ? gender : null;
-
-        if (value !== null) {
-          const { error } = await supabase
-            .from('profile_field_values')
-            .upsert({
-              profile_id: user.id,
-              field_id: field.id,
-              value: value
-            }, {
-              onConflict: 'profile_id,field_id'
-            });
-
-          if (error) throw error;
-        }
+      if (error) {
+        console.error("Update error:", error);
+        throw error;
       }
 
       toast.success("Profile updated successfully");
       setIsEditing(false);
       refetch();
     } catch (error: any) {
+      console.error("Save error:", error);
       toast.error("Failed to update profile");
-      console.error("Error updating profile:", error);
     }
   };
 
