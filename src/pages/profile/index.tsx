@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useFreeTier } from "@/hooks/useFreeTier";
@@ -11,7 +10,6 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { SubscriptionDetails } from "@/components/profile/SubscriptionDetails";
 import { PasswordSection } from "@/components/profile/PasswordSection";
-import { CreditsPurchaseCard } from "@/components/profile/CreditsPurchaseCard";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -39,7 +37,6 @@ export default function ProfilePage() {
         throw profileError;
       }
 
-      // Fetch field definitions first
       const { data: fields, error: fieldsError } = await supabase
         .from("profile_fields")
         .select("id, name")
@@ -50,7 +47,6 @@ export default function ProfilePage() {
         throw fieldsError;
       }
 
-      // Then fetch values for these fields
       const { data: fieldValues, error: fieldValuesError } = await supabase
         .from("profile_field_values")
         .select(`
@@ -67,7 +63,6 @@ export default function ProfilePage() {
         throw fieldValuesError;
       }
 
-      // Update state with values
       fieldValues?.forEach((field) => {
         const fieldName = field.profile_fields?.name;
         const value = field.value;
@@ -187,14 +182,13 @@ export default function ProfilePage() {
       </Card>
 
       <div className="space-y-6">
-        <CreditsPurchaseCard />
-        <PasswordSection />
         <SubscriptionDetails
           isFreeTier={isFreeTier}
           subscriptionPlan={profileData?.subscription_plan}
           remainingStories={remainingStories}
           subscriptionEndDate={profileData?.subscription_end_date}
         />
+        <PasswordSection />
       </div>
     </div>
   );

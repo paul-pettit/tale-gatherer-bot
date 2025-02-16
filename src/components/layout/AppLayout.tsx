@@ -12,22 +12,27 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
+import { useFreeTier } from "@/hooks/useFreeTier";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Home, PenSquare, User, LogOut, Shield } from "lucide-react";
+import { Home, PenSquare, User, LogOut, Shield, Gem } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { remainingStories } = useFreeTier();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [subscriptionPlan, setSubscriptionPlan] = useState('free');
 
   useEffect(() => {
     if (user) {
       checkAdminStatus();
+      fetchSubscriptionPlan();
     }
   }, [user]);
 
@@ -40,6 +45,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       setIsAdmin(hasRole);
     } catch (error) {
       console.error('Error checking admin status:', error);
+    }
+  };
+
+  const fetchSubscriptionPlan = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('subscription_plan')
+      .eq('id', user.id)
+      .single();
+      
+    if (!error && data) {
+      setSubscriptionPlan(data.subscription_plan);
     }
   };
 
@@ -105,6 +124,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <span className="text-sm font-medium text-sidebar-foreground truncate block" title={user?.email}>
                   {user?.email}
                 </span>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant={subscriptionPlan === 'premium' ? 'default' : 'secondary'} className="text-xs">
+                    {subscriptionPlan.charAt(0).toUpperCase() + subscriptionPlan.slice(1)}
+                  </Badge>
+                  <span className="text-xs text-sidebar-foreground/80 flex items-center gap-1">
+                    <Gem className="h-3 w-3" />
+                    {remainingStories}
+                  </span>
+                </div>
               </div>
               <Button
                 variant="ghost"

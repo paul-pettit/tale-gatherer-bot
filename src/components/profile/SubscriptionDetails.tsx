@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { CreditsPurchaseCard } from "./CreditsPurchaseCard";
 
 interface SubscriptionDetailsProps {
   isFreeTier: boolean;
@@ -33,6 +34,9 @@ export function SubscriptionDetails({
           <p className="text-sm text-muted-foreground">
             {remainingStories} {remainingStories === 1 ? "story" : "stories"} remaining
           </p>
+          <div className="mt-4">
+            <CreditsPurchaseCard />
+          </div>
         </div>
         {subscriptionEndDate && (
           <>
