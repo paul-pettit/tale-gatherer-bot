@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useFreeTier } from "@/hooks/useFreeTier";
@@ -10,6 +11,7 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { SubscriptionDetails } from "@/components/profile/SubscriptionDetails";
 import { PasswordSection } from "@/components/profile/PasswordSection";
+import { PurchaseHistory } from "@/components/profile/PurchaseHistory";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -188,6 +190,7 @@ export default function ProfilePage() {
           remainingStories={remainingStories}
           subscriptionEndDate={profileData?.subscription_end_date}
         />
+        <PurchaseHistory />
         <PasswordSection />
       </div>
     </div>
