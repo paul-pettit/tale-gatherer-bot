@@ -11,6 +11,19 @@ interface ProfileInfoProps {
 }
 
 export function ProfileInfo({ firstName, age, hometown, gender, onEdit }: ProfileInfoProps) {
+  const formatGender = (gender: string) => {
+    if (!gender || gender === "Not set") return "Not set";
+    
+    const genderMap: Record<string, string> = {
+      "male": "Male",
+      "female": "Female",
+      "non-binary": "Non-binary",
+      "prefer-not-to-say": "Prefer not to say"
+    };
+
+    return genderMap[gender] || gender;
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -27,7 +40,7 @@ export function ProfileInfo({ firstName, age, hometown, gender, onEdit }: Profil
       </div>
       <div>
         <Label>Gender</Label>
-        <p className="text-sm text-muted-foreground">{gender || "Not set"}</p>
+        <p className="text-sm text-muted-foreground">{formatGender(gender)}</p>
       </div>
       <Button onClick={onEdit}>Edit Profile</Button>
     </div>
