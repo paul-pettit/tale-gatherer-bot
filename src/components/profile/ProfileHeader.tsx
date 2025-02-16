@@ -14,9 +14,9 @@ export function ProfileHeader({ avatarUrl, firstName, email }: ProfileHeaderProp
         <AvatarImage src={avatarUrl} />
         <AvatarFallback>{firstName?.[0] || email?.[0]}</AvatarFallback>
       </Avatar>
-      <div className="min-w-0"> {/* Add min-w-0 to allow text truncation */}
-        <h3 className="text-2xl font-semibold truncate">{firstName || "Anonymous User"}</h3>
-        <p className="text-sm text-muted-foreground truncate" title={email}>
+      <div className="flex flex-col">
+        <h3 className="text-2xl font-semibold">{firstName || "Not set"}</h3>
+        <p className="text-sm text-muted-foreground">
           {email}
         </p>
       </div>
