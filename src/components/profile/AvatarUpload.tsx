@@ -1,17 +1,14 @@
+
 import { useCallback, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash, Upload } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import ReactCrop, { type Crop } from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { type Crop } from 'react-image-crop';
+import { AvatarCropDialog } from "./avatar/AvatarCropDialog";
+import { AvatarOptionsMenu } from "./avatar/AvatarOptionsMenu";
+import { getCroppedImg } from "./avatar/image-cropper";
 
 interface AvatarUploadProps {
   userId: string;
@@ -74,51 +71,6 @@ export function AvatarUpload({
       setShowOptions(false);
     });
     reader.readAsDataURL(file);
-  };
-
-  const getCroppedImg = (image: HTMLImageElement, crop: Crop): Promise<Blob> => {
-    const canvas = document.createElement('canvas');
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) {
-      throw new Error('No 2d context');
-    }
-
-    const cropWidth = (crop.width * image.width * scaleX) / 100;
-    const cropHeight = (crop.height * image.height * scaleY) / 100;
-    const size = Math.min(cropWidth, cropHeight);
-
-    canvas.width = size;
-    canvas.height = size;
-
-    ctx.beginPath();
-    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2, true);
-    ctx.closePath();
-    ctx.clip();
-
-    const cropX = (crop.x * image.width * scaleX) / 100;
-    const cropY = (crop.y * image.height * scaleY) / 100;
-
-    ctx.drawImage(
-      image,
-      cropX,
-      cropY,
-      cropWidth,
-      cropHeight,
-      0,
-      0,
-      size,
-      size
-    );
-
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => {
-        if (!blob) throw new Error('Canvas is empty');
-        resolve(blob);
-      }, 'image/jpeg', 1);
-    });
   };
 
   const handleCropComplete = useCallback(async () => {
@@ -212,47 +164,14 @@ export function AvatarUpload({
           </Button>
         </div>
 
-        {showOptions && (
-          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-card p-2 rounded-lg shadow-lg border flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="relative"
-              disabled={isUploading}
-            >
-              <input
-                type="file"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                onChange={onSelectFile}
-                accept="image/*"
-                disabled={isUploading}
-              />
-              {avatarUrl ? <Pencil className="h-4 w-4 mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
-              {avatarUrl ? 'Change' : 'Upload'}
-            </Button>
-            
-            {avatarUrl && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDelete}
-                disabled={isUploading}
-              >
-                <Trash className="h-4 w-4 mr-2" />
-                Remove
-              </Button>
-            )}
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowOptions(false)}
-              className="ml-1"
-            >
-              Cancel
-            </Button>
-          </div>
-        )}
+        <AvatarOptionsMenu
+          show={showOptions}
+          onClose={() => setShowOptions(false)}
+          onFileChange={onSelectFile}
+          onDelete={handleDelete}
+          isUploading={isUploading}
+          hasAvatar={!!avatarUrl}
+        />
 
         {showSkip && onSkip && (
           <Button
@@ -267,49 +186,21 @@ export function AvatarUpload({
         )}
       </div>
 
-      <Dialog open={showCropDialog} onOpenChange={setShowCropDialog}>
-        <DialogContent className="max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Crop Profile Picture</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-4">
-            {imgSrc && (
-              <ReactCrop
-                crop={crop}
-                onChange={(_, percentCrop) => setCrop(percentCrop)}
-                aspect={1}
-                circularCrop
-                className="max-w-full mx-auto"
-              >
-                <img
-                  ref={(e) => setImageRef(e)}
-                  src={imgSrc}
-                  alt="Crop me"
-                  className="max-w-full h-auto mx-auto"
-                />
-              </ReactCrop>
-            )}
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowCropDialog(false);
-                  setImgSrc('');
-                  setSelectedFile(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleCropComplete}
-                disabled={isUploading}
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <AvatarCropDialog
+        open={showCropDialog}
+        onOpenChange={setShowCropDialog}
+        imgSrc={imgSrc}
+        crop={crop}
+        onCropChange={setCrop}
+        onSave={handleCropComplete}
+        onCancel={() => {
+          setShowCropDialog(false);
+          setImgSrc('');
+          setSelectedFile(null);
+        }}
+        isLoading={isUploading}
+        imageRef={setImageRef}
+      />
     </div>
   );
 }
