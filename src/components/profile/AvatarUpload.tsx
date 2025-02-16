@@ -26,6 +26,7 @@ export function AvatarUpload({
   fallback 
 }: AvatarUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
 
   const sizeClasses = {
     sm: "h-16 w-16",
@@ -81,6 +82,7 @@ export function AvatarUpload({
       toast.error('Error uploading image: ' + error.message);
     } finally {
       setIsUploading(false);
+      setShowOptions(false);
     }
   }, [userId, avatarUrl, onAvatarChange]);
 
@@ -104,47 +106,71 @@ export function AvatarUpload({
       toast.error('Error removing image: ' + error.message);
     } finally {
       setIsUploading(false);
+      setShowOptions(false);
     }
   }, [userId, avatarUrl, onAvatarChange]);
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col items-center gap-4">
+      <div className="relative group">
         <Avatar className={sizeClasses[size]}>
           <AvatarImage src={avatarUrl} />
           <AvatarFallback>{fallback}</AvatarFallback>
         </Avatar>
-        
-        <div className="flex gap-2">
+
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
-            className="relative"
-            disabled={isUploading}
+            className="relative z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() => setShowOptions(true)}
           >
-            <input
-              type="file"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              onChange={handleUpload}
-              accept="image/*"
-              disabled={isUploading}
-            />
-            {avatarUrl ? <Pencil className="h-4 w-4 mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
-            {avatarUrl ? 'Change' : 'Upload'}
+            <Pencil className="h-4 w-4" />
           </Button>
-          
-          {avatarUrl && (
+        </div>
+
+        {showOptions && (
+          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-card p-2 rounded-lg shadow-lg border flex gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={handleDelete}
+              className="relative"
               disabled={isUploading}
             >
-              <Trash className="h-4 w-4 mr-2" />
-              Remove
+              <input
+                type="file"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                onChange={handleUpload}
+                accept="image/*"
+                disabled={isUploading}
+              />
+              {avatarUrl ? <Pencil className="h-4 w-4 mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
+              {avatarUrl ? 'Change' : 'Upload'}
             </Button>
-          )}
-        </div>
+            
+            {avatarUrl && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDelete}
+                disabled={isUploading}
+              >
+                <Trash className="h-4 w-4 mr-2" />
+                Remove
+              </Button>
+            )}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowOptions(false)}
+              className="ml-1"
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
 
         {showSkip && onSkip && (
           <Button
@@ -152,6 +178,7 @@ export function AvatarUpload({
             size="sm"
             onClick={onSkip}
             disabled={isUploading}
+            className="mt-4"
           >
             Skip for now
           </Button>
