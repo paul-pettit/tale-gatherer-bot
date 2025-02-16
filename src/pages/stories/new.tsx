@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,6 +8,7 @@ import { toast } from 'sonner';
 import { StoryHeader } from '@/components/stories/StoryHeader';
 import { QuestionCard } from '@/components/stories/QuestionCard';
 import { ChatSession } from '@/components/stories/ChatSession';
+import { Separator } from '@/components/ui/separator';
 
 interface Question {
   id: string;
@@ -165,7 +165,7 @@ export default function NewStoryPage() {
           <CardContent className="p-8">
             <div className="flex justify-center items-center min-h-[400px]">
               <div className="animate-pulse text-lg text-muted-foreground">
-                Loading story prompts...
+                Loading interview prompts...
               </div>
             </div>
           </CardContent>
@@ -175,8 +175,8 @@ export default function NewStoryPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <Card>
+    <div className="container mx-auto px-4 py-12 max-w-7xl">
+      <Card className="border-none shadow-none bg-transparent">
         <StoryHeader 
           remainingStories={remainingStories}
           lastSaved={null}
@@ -184,8 +184,15 @@ export default function NewStoryPage() {
         <CardContent className="p-8">
           {!selectedQuestion ? (
             <>
-              <h2 className="text-3xl font-bold text-center mb-8">Choose Your Story Prompt</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="max-w-2xl mx-auto text-center mb-16">
+                <h2 className="text-4xl font-serif font-bold mb-4">Your Story Matters</h2>
+                <Separator className="w-24 mx-auto my-6" />
+                <p className="text-lg text-muted-foreground">
+                  Choose a prompt below to begin your interview. Each question is designed 
+                  to draw out the meaningful moments of your life story.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {questions.map((question) => (
                   <QuestionCard
                     key={question.id}
