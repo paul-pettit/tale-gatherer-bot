@@ -24,17 +24,24 @@ serve(async (req: Request) => {
     let body;
     try {
       body = await req.json();
+      console.log('Received request body:', body);
     } catch (e) {
+      console.error('Failed to parse request body:', e);
       throw new Error('Failed to parse request body');
     }
 
     const { packageId, userId } = body;
 
-    if (!packageId || !userId) {
-      throw new Error('Missing required parameters');
+    if (!packageId) {
+      console.error('Missing packageId in request');
+      throw new Error('Missing packageId parameter');
+    }
+    if (!userId) {
+      console.error('Missing userId in request');
+      throw new Error('Missing userId parameter');
     }
 
-    console.log('Received request with packageId:', packageId, 'and userId:', userId);
+    console.log('Processing request for packageId:', packageId, 'and userId:', userId);
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -48,6 +55,7 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '',
     )
 
+    console.log('Fetching credit package details...');
     // Get the credit package details
     const { data: creditPackage, error: packageError } = await supabaseAdmin
       .from('credit_packages')
@@ -55,52 +63,60 @@ serve(async (req: Request) => {
       .eq('id', packageId)
       .single()
 
-    if (packageError || !creditPackage) {
+    if (packageError) {
       console.error('Credit package error:', packageError);
-      throw new Error('Credit package not found')
+      throw new Error(`Credit package not found: ${packageError.message}`);
+    }
+    if (!creditPackage) {
+      console.error('No credit package found for id:', packageId);
+      throw new Error('Credit package not found');
     }
 
     console.log('Found credit package:', creditPackage);
 
     // Get or create customer
+    console.log('Fetching profile for user:', userId);
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
-      .select('stripe_customer_id')
+      .select('stripe_customer_id, email')
       .eq('id', userId)
       .single()
 
     if (profileError) {
       console.error('Profile error:', profileError);
-      throw new Error('Profile not found')
+      throw new Error(`Profile not found: ${profileError.message}`);
     }
 
-    let customerId = profile.stripe_customer_id
+    let customerId = profile.stripe_customer_id;
 
     if (!customerId) {
       console.log('No existing Stripe customer ID found, creating new customer');
-      const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
+      const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
+      
       if (userError || !userData.user) {
         console.error('User error:', userError);
-        throw new Error('User not found')
+        throw new Error(`User not found: ${userError?.message || 'No user data'}`);
       }
 
+      console.log('Creating Stripe customer for email:', userData.user.email);
       const customer = await stripe.customers.create({
         email: userData.user.email,
         metadata: {
           userId: userId,
         },
-      })
+      });
 
-      customerId = customer.id
+      customerId = customer.id;
       console.log('Created new Stripe customer:', customerId);
 
       await supabaseAdmin
         .from('profiles')
         .update({ stripe_customer_id: customerId })
-        .eq('id', userId)
+        .eq('id', userId);
     }
 
     // Create a new credit purchase record
+    console.log('Creating credit purchase record...');
     const { data: purchase, error: purchaseError } = await supabaseAdmin
       .from('credit_purchases')
       .insert({
@@ -111,16 +127,17 @@ serve(async (req: Request) => {
         status: 'pending'
       })
       .select()
-      .single()
+      .single();
 
     if (purchaseError) {
       console.error('Purchase record error:', purchaseError);
-      throw new Error('Failed to create purchase record')
+      throw new Error(`Failed to create purchase record: ${purchaseError.message}`);
     }
 
     console.log('Created purchase record:', purchase);
 
     // Create Stripe checkout session
+    console.log('Creating Stripe checkout session...');
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [{
@@ -135,7 +152,7 @@ serve(async (req: Request) => {
         userId: userId,
         credits: creditPackage.credits.toString(),
       },
-    })
+    });
 
     console.log('Created Stripe checkout session:', session.id);
 
@@ -143,7 +160,7 @@ serve(async (req: Request) => {
     await supabaseAdmin
       .from('credit_purchases')
       .update({ stripe_session_id: session.id })
-      .eq('id', purchase.id)
+      .eq('id', purchase.id);
 
     return new Response(
       JSON.stringify({ url: session.url }),
@@ -153,11 +170,14 @@ serve(async (req: Request) => {
           'Content-Type': 'application/json',
         },
       },
-    )
+    );
   } catch (error) {
     console.error('Function error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.toString()
+      }),
       {
         status: 400,
         headers: {
@@ -165,6 +185,6 @@ serve(async (req: Request) => {
           'Content-Type': 'application/json',
         },
       },
-    )
+    );
   }
-})
+});

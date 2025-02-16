@@ -32,25 +32,21 @@ export function useCredits() {
     try {
       setIsLoading(true);
       
-      // Debug log
       console.log('Starting purchase process for package:', packageId);
+      console.log('User ID:', user.id);
       
-      // Try to invoke the function with the correct name
-      console.log('Attempting to invoke create-credit-checkout function...');
-      const { data, error } = await supabase.functions.invoke<{ url: string }>('create-credit-checkout', {
+      const { data, error } = await supabase.functions.invoke<{ url: string; error?: string }>('create-credit-checkout', {
         body: {
           packageId,
           userId: user.id,
         },
       });
 
-      // Log any errors
-      if (error) {
-        console.error('Detailed error:', error);
-        throw error;
+      if (error || data?.error) {
+        console.error('Error response:', error || data?.error);
+        throw new Error(error?.message || data?.error || 'Failed to initiate purchase');
       }
 
-      // Log success
       console.log('Successfully received response:', data);
 
       if (!data?.url) {
