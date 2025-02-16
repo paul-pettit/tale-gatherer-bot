@@ -97,12 +97,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarContent>
           <SidebarFooter className="border-t border-sidebar-border p-4">
             <div className="flex items-center gap-4 px-2 py-3">
-              <Avatar className="h-9 w-9">
+              <Avatar className="h-9 w-9 flex-shrink-0">
                 <AvatarImage src={user?.user_metadata?.avatar_url} />
                 <AvatarFallback>{user?.email?.[0]?.toUpperCase()}</AvatarFallback>
               </Avatar>
-              <div className="flex flex-col flex-1">
-                <span className="text-sm font-medium text-sidebar-foreground">
+              <div className="min-w-0 flex-1">
+                <span className="text-sm font-medium text-sidebar-foreground truncate block" title={user?.email}>
                   {user?.email}
                 </span>
               </div>
@@ -110,7 +110,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 variant="ghost"
                 size="icon"
                 onClick={handleSignOut}
-                className="ml-auto text-sidebar-foreground hover:text-sidebar-foreground/90"
+                className="ml-auto flex-shrink-0 text-sidebar-foreground hover:text-sidebar-foreground/90"
               >
                 <LogOut className="h-4 w-4" />
               </Button>
