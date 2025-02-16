@@ -9,16 +9,29 @@ const corsHeaders = {
 }
 
 serve(async (req: Request) => {
-  // Handle CORS
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, {
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      },
+    })
   }
 
   try {
-    const { packageId, userId } = await req.json()
+    // Parse the request body
+    let body;
+    try {
+      body = await req.json();
+    } catch (e) {
+      throw new Error('Failed to parse request body');
+    }
+
+    const { packageId, userId } = body;
 
     if (!packageId || !userId) {
-      throw new Error('Missing required parameters')
+      throw new Error('Missing required parameters');
     }
 
     console.log('Received request with packageId:', packageId, 'and userId:', userId);

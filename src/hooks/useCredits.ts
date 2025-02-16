@@ -35,7 +35,7 @@ export function useCredits() {
       // Debug log
       console.log('Starting purchase process for package:', packageId);
       
-      // Try to invoke the function
+      // Try to invoke the function with the correct name
       console.log('Attempting to invoke create-credit-checkout function...');
       const { data, error } = await supabase.functions.invoke<{ url: string }>('create-credit-checkout', {
         body: {
