@@ -52,7 +52,8 @@ export function AvatarCropDialog({
                 ref={imageRef}
                 src={imgSrc}
                 alt="Crop me"
-                className="max-w-full h-auto mx-auto"
+                className="max-w-full h-auto mx-auto object-contain"
+                style={{ maxHeight: '60vh' }}
               />
             </ReactCrop>
           )}
