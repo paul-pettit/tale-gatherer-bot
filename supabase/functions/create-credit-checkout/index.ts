@@ -67,6 +67,12 @@ serve(async (req: Request) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
+    console.log('Environment check:', {
+      hasStripeKey: !!stripeKey,
+      hasSupabaseUrl: !!supabaseUrl,
+      hasSupabaseKey: !!supabaseKey
+    });
+
     if (!stripeKey || !supabaseUrl || !supabaseKey) {
       throw new Error('Missing required environment variables');
     }
@@ -85,6 +91,8 @@ serve(async (req: Request) => {
       .eq('id', packageId)
       .single();
 
+    console.log('Credit package lookup:', { creditPackage, error: packageError });
+
     if (packageError || !creditPackage) {
       console.error('Package error:', packageError);
       throw new Error('Failed to fetch credit package');
@@ -97,6 +105,8 @@ serve(async (req: Request) => {
       .eq('id', userId)
       .single();
 
+    console.log('Profile lookup:', { profile, error: profileError });
+
     if (profileError) {
       console.error('Profile error:', profileError);
       throw new Error('Failed to fetch user profile');
@@ -107,6 +117,8 @@ serve(async (req: Request) => {
     if (!customerId) {
       const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
       
+      console.log('User data lookup:', { userData, error: userError });
+
       if (userError || !userData.user) {
         console.error('User error:', userError);
         throw new Error('Failed to fetch user data');
@@ -116,6 +128,8 @@ serve(async (req: Request) => {
         email: userData.user.email,
         metadata: { userId },
       });
+
+      console.log('Created new Stripe customer:', customer.id);
 
       customerId = customer.id;
 
@@ -138,13 +152,15 @@ serve(async (req: Request) => {
       .select()
       .single();
 
+    console.log('Purchase record creation:', { purchase, error: purchaseError });
+
     if (purchaseError || !purchase) {
       console.error('Purchase error:', purchaseError);
       throw new Error('Failed to create purchase record');
     }
 
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig = {
       customer: customerId,
       line_items: [{
         price: creditPackage.stripe_price_id,
@@ -158,13 +174,23 @@ serve(async (req: Request) => {
         userId,
         credits: creditPackage.credits.toString(),
       },
-    });
+    };
+
+    console.log('Creating checkout session with config:', sessionConfig);
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
+
+    console.log('Checkout session created:', session.id);
 
     // Update purchase with session ID
-    await supabaseAdmin
+    const { error: updateError } = await supabaseAdmin
       .from('credit_purchases')
       .update({ stripe_session_id: session.id })
       .eq('id', purchase.id);
+
+    if (updateError) {
+      console.error('Error updating purchase with session ID:', updateError);
+    }
 
     return new Response(
       JSON.stringify({ url: session.url }),
@@ -193,3 +219,4 @@ serve(async (req: Request) => {
     );
   }
 });
+
