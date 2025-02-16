@@ -27,22 +27,18 @@ serve(async (req: Request) => {
     const contentType = req.headers.get('content-type') || '';
     
     if (contentType.includes('application/json')) {
-      // For direct API calls with JSON
       body = await req.json();
     } else {
-      // For Supabase Functions client which sends raw body
       const rawBody = await req.text();
       try {
         body = JSON.parse(rawBody);
       } catch (e) {
-        // If parsing fails, the body might already be an object
         body = rawBody;
       }
     }
 
     console.log('Processed request body:', body);
 
-    // Validate the body structure
     if (typeof body === 'string') {
       try {
         body = JSON.parse(body);
@@ -54,7 +50,6 @@ serve(async (req: Request) => {
 
     const { packageId, userId } = body;
 
-    // Validate required fields
     if (!packageId) {
       throw new Error('Missing required field: packageId');
     }
@@ -62,7 +57,6 @@ serve(async (req: Request) => {
       throw new Error('Missing required field: userId');
     }
 
-    // Initialize required services
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -70,7 +64,8 @@ serve(async (req: Request) => {
     console.log('Environment check:', {
       hasStripeKey: !!stripeKey,
       hasSupabaseUrl: !!supabaseUrl,
-      hasSupabaseKey: !!supabaseKey
+      hasSupabaseKey: !!supabaseKey,
+      stripeKeyPrefix: stripeKey?.substring(0, 3) // Log just the prefix to check if it's live/test
     });
 
     if (!stripeKey || !supabaseUrl || !supabaseKey) {
@@ -84,7 +79,6 @@ serve(async (req: Request) => {
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
 
-    // Fetch credit package
     const { data: creditPackage, error: packageError } = await supabaseAdmin
       .from('credit_packages')
       .select('*')
@@ -102,30 +96,33 @@ serve(async (req: Request) => {
       throw new Error('Failed to fetch credit package');
     }
 
-    // Validate Stripe price ID
     if (!creditPackage.stripe_price_id) {
       throw new Error('Credit package is missing Stripe price ID');
     }
 
     try {
-      // Verify the price exists in Stripe
       const price = await stripe.prices.retrieve(creditPackage.stripe_price_id);
       console.log('Stripe price verification:', { 
         price_id: price.id,
         active: price.active,
         currency: price.currency,
-        unit_amount: price.unit_amount
+        unit_amount: price.unit_amount,
+        type: price.type,
+        recurring: price.recurring
       });
 
       if (!price.active) {
         throw new Error('Stripe price is inactive');
+      }
+
+      if (price.type !== 'one_time') {
+        throw new Error('Invalid price type. Expected one-time payment price.');
       }
     } catch (error) {
       console.error('Stripe price verification error:', error);
       throw new Error('Invalid or inactive Stripe price');
     }
 
-    // Get or create Stripe customer
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('stripe_customer_id')
@@ -166,7 +163,6 @@ serve(async (req: Request) => {
         .eq('id', userId);
     }
 
-    // Create purchase record
     const { data: purchase, error: purchaseError } = await supabaseAdmin
       .from('credit_purchases')
       .insert({
@@ -186,7 +182,16 @@ serve(async (req: Request) => {
       throw new Error('Failed to create purchase record');
     }
 
-    // Create Stripe checkout session
+    const origin = req.headers.get('origin');
+    if (!origin) {
+      throw new Error('Missing origin header');
+    }
+
+    const successUrl = `${origin}/credits/success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${origin}/credits`;
+
+    console.log('URLs:', { successUrl, cancelUrl });
+
     const sessionConfig = {
       customer: customerId,
       line_items: [{
@@ -194,8 +199,8 @@ serve(async (req: Request) => {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: `${req.headers.get('origin')}/credits/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get('origin')}/credits`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       metadata: {
         purchaseId: purchase.id,
         userId,
@@ -207,9 +212,13 @@ serve(async (req: Request) => {
 
     const session = await stripe.checkout.sessions.create(sessionConfig);
 
-    console.log('Checkout session created:', session.id);
+    console.log('Checkout session created:', {
+      sessionId: session.id,
+      url: session.url,
+      mode: session.mode,
+      paymentStatus: session.payment_status
+    });
 
-    // Update purchase with session ID
     const { error: updateError } = await supabaseAdmin
       .from('credit_purchases')
       .update({ stripe_session_id: session.id })
