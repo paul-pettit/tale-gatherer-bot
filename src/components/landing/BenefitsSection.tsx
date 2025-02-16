@@ -9,6 +9,13 @@ export function BenefitsSection() {
         <div className="grid md:grid-cols-3 gap-12">
           <div className="text-center">
             <div className="bg-card rounded-lg p-6 h-full shadow-sm">
+              <div className="mb-6">
+                <img 
+                  src="/lovable-uploads/bd41d744-b989-432b-9eaa-f484190d1536.png" 
+                  alt="Family working together on crafts" 
+                  className="w-full h-auto rounded-lg mb-4"
+                />
+              </div>
               <h3 className="text-xl font-semibold mb-4">Collaborative Storytelling</h3>
               <p className="text-muted-foreground">
                 Multiple family members can contribute to the same story, adding their unique perspectives.
