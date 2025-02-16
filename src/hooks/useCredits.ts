@@ -36,6 +36,13 @@ export function useCredits() {
         packageId,
         userId: user.id,
       });
+
+      // Get the current session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('No active session found');
+      }
       
       const { data, error } = await supabase.functions.invoke<{ url: string; error?: string }>('create-credit-checkout', {
         body: {
@@ -43,6 +50,7 @@ export function useCredits() {
           userId: user.id,
         },
         headers: {
+          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
       });
