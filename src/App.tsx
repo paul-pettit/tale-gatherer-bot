@@ -9,6 +9,8 @@ import { StoryGuard } from "@/components/StoryGuard";
 import AppLayout from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import AuthPage from "./pages/auth";
+import VerificationPendingPage from "./pages/auth/verification-pending";
+import OnboardingPage from "./pages/onboarding";
 import SubscriptionPage from "./pages/subscription";
 import SubscriptionSuccess from "./pages/subscription/success";
 import NotFound from "./pages/NotFound";
@@ -29,6 +31,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/auth/verification-pending" element={<VerificationPendingPage />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/subscription" element={<SubscriptionPage />} />
             <Route path="/subscription/success" element={<SubscriptionSuccess />} />
             <Route

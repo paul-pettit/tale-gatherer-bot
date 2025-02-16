@@ -56,7 +56,7 @@ export default function AuthPage() {
         }
 
         toast.success('Registration successful! Please check your email to verify your account.');
-        navigate('/subscription');
+        navigate('/auth/verification-pending');
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
