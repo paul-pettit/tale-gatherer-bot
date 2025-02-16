@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -185,7 +186,7 @@ export default function NewStoryPage() {
           {!selectedQuestion ? (
             <>
               <div className="max-w-2xl mx-auto text-center mb-16">
-                <h2 className="text-4xl font-serif font-bold mb-4">Your Story Matters</h2>
+                <h2 className="text-4xl font-serif font-bold mb-4">Tell Your Story Well</h2>
                 <Separator className="w-24 mx-auto my-6" />
                 <p className="text-lg text-muted-foreground">
                   Choose a prompt below to begin your interview. Each question is designed 
