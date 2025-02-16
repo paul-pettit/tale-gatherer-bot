@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useFreeTier } from "@/hooks/useFreeTier";
@@ -20,6 +19,7 @@ export default function ProfilePage() {
   const [age, setAge] = useState("");
   const [hometown, setHometown] = useState("");
   const [gender, setGender] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>();
 
   const { data: profileData, refetch } = useQuery({
     queryKey: ["profile", user?.id],
@@ -118,6 +118,24 @@ export default function ProfilePage() {
     }
   };
 
+  const handleAvatarChange = async (url: string | null) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: url })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      setAvatarUrl(url || undefined);
+      refetch();
+    } catch (error: any) {
+      toast.error('Failed to update profile picture');
+      console.error('Avatar update error:', error);
+    }
+  };
+
   const getFieldValue = (fieldName: string) => {
     const field = profileData?.fieldValues?.find(
       (f) => f.profile_fields?.name === fieldName
@@ -133,9 +151,10 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <ProfileHeader
-            avatarUrl={profileData?.avatar_url}
+            avatarUrl={avatarUrl || profileData?.avatar_url}
             firstName={getFieldValue('first_name')}
             email={user?.email}
+            onAvatarChange={handleAvatarChange}
           />
 
           {isEditing ? (
