@@ -35,29 +35,32 @@ export function useCredits() {
       console.log('Starting purchase process for package:', packageId);
       console.log('User ID:', user.id);
       
-      const { data, error: functionError } = await supabase.functions.invoke<{ url: string; error?: string }>('create-credit-checkout', {
+      const response = await supabase.functions.invoke<{ url: string; error?: string }>('create-credit-checkout', {
         body: {
           packageId,
           userId: user.id,
         },
       });
 
-      if (functionError) {
-        console.error('Edge function error:', functionError);
-        throw new Error(functionError.message || 'Failed to initiate purchase');
+      if (response.error) {
+        console.error('Edge function error:', response.error);
+        throw new Error(
+          response.error.message || 
+          (response.data?.error ? JSON.stringify(response.data.error) : 'Failed to initiate purchase')
+        );
       }
 
-      if (data?.error) {
-        console.error('Application error:', data.error);
-        throw new Error(data.error);
+      if (response.data?.error) {
+        console.error('Application error:', response.data.error);
+        throw new Error(response.data.error);
       }
 
-      if (!data?.url) {
+      if (!response.data?.url) {
         throw new Error('No checkout URL received from Stripe');
       }
 
       // Redirect to Stripe checkout
-      window.location.href = data.url;
+      window.location.href = response.data.url;
     } catch (error: any) {
       console.error('Purchase error:', error);
       toast.error(error.message || 'Failed to initiate purchase. Please try again.');
