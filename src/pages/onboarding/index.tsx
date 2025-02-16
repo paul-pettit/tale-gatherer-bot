@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, UserCheck, MessageCircle } from 'lucide-react';
+import { Shield, UserCheck, MessageCircle, ArrowRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
