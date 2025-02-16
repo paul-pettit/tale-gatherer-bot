@@ -10,7 +10,7 @@ export function useCredits() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { data: creditPackages } = useQuery({
+  const { data: creditPackages, error, refetch } = useQuery({
     queryKey: ['credit-packages'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -61,6 +61,9 @@ export function useCredits() {
         throw new Error('No checkout URL received from Stripe');
       }
 
+      // Store current page URL to handle back navigation
+      sessionStorage.setItem('creditPurchaseReturnUrl', window.location.href);
+
       // Redirect to Stripe checkout
       window.location.href = data.url;
     } catch (error: any) {
@@ -78,6 +81,8 @@ export function useCredits() {
   return {
     creditPackages,
     isLoading,
-    handlePurchase
+    handlePurchase,
+    error,
+    refetch
   };
 }
