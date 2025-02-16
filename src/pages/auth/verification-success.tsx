@@ -9,9 +9,9 @@ export default function VerificationSuccessPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect to onboarding page after 3 seconds
+    // Redirect to subscription page after 3 seconds
     const timeout = setTimeout(() => {
-      navigate('/onboarding');
+      navigate('/subscription');
     }, 3000);
 
     return () => clearTimeout(timeout);
@@ -26,15 +26,15 @@ export default function VerificationSuccessPage() {
           </div>
           <CardTitle className="text-2xl mb-2">Email Verified!</CardTitle>
           <CardDescription className="text-lg">
-            Your email has been successfully verified. Let's set up your profile.
+            Your email has been successfully verified. Let's choose your subscription plan.
           </CardDescription>
         </CardHeader>
         <CardFooter className="flex justify-center">
           <Button
-            onClick={() => navigate('/onboarding')}
+            onClick={() => navigate('/subscription')}
             className="mt-2"
           >
-            Continue to Setup
+            Continue to Subscription Plans
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </CardFooter>
