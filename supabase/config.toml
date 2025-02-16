@@ -1,5 +1,5 @@
 
 project_id = "bykodzpccfujhxighpzi"
 
-[functions.create-checkout]
+[functions.create-credit-checkout]
 verify_jwt = true

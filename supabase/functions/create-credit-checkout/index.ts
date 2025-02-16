@@ -21,6 +21,8 @@ serve(async (req: Request) => {
       throw new Error('Missing required parameters')
     }
 
+    console.log('Received request with packageId:', packageId, 'and userId:', userId);
+
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
@@ -41,8 +43,11 @@ serve(async (req: Request) => {
       .single()
 
     if (packageError || !creditPackage) {
+      console.error('Credit package error:', packageError);
       throw new Error('Credit package not found')
     }
+
+    console.log('Found credit package:', creditPackage);
 
     // Get or create customer
     const { data: profile, error: profileError } = await supabaseAdmin
@@ -52,14 +57,17 @@ serve(async (req: Request) => {
       .single()
 
     if (profileError) {
+      console.error('Profile error:', profileError);
       throw new Error('Profile not found')
     }
 
     let customerId = profile.stripe_customer_id
 
     if (!customerId) {
+      console.log('No existing Stripe customer ID found, creating new customer');
       const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
       if (userError || !userData.user) {
+        console.error('User error:', userError);
         throw new Error('User not found')
       }
 
@@ -71,6 +79,7 @@ serve(async (req: Request) => {
       })
 
       customerId = customer.id
+      console.log('Created new Stripe customer:', customerId);
 
       await supabaseAdmin
         .from('profiles')
@@ -92,8 +101,11 @@ serve(async (req: Request) => {
       .single()
 
     if (purchaseError) {
+      console.error('Purchase record error:', purchaseError);
       throw new Error('Failed to create purchase record')
     }
+
+    console.log('Created purchase record:', purchase);
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -112,6 +124,8 @@ serve(async (req: Request) => {
       },
     })
 
+    console.log('Created Stripe checkout session:', session.id);
+
     // Update purchase record with session ID
     await supabaseAdmin
       .from('credit_purchases')
@@ -128,6 +142,7 @@ serve(async (req: Request) => {
       },
     )
   } catch (error) {
+    console.error('Function error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
