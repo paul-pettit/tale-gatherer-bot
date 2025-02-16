@@ -1,4 +1,3 @@
-
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@12.6.0?target=deno'
@@ -15,10 +14,22 @@ serve(async (req: Request) => {
   }
 
   try {
-    console.log('Starting checkout process...');
+    // Log the full request for debugging
+    console.log('Request method:', req.method);
+    console.log('Request headers:', Object.fromEntries(req.headers.entries()));
+    const rawBody = await req.text();
+    console.log('Raw request body:', rawBody);
+    
+    // Parse the JSON body
+    const body = JSON.parse(rawBody);
+    console.log('Parsed request body:', body);
+
+    const { priceId, userId } = body;
     
     // Initialize Stripe
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
+    console.log('Stripe key exists:', !!stripeKey);
+    
     if (!stripeKey) {
       throw new Error('Stripe secret key not configured');
     }
@@ -28,17 +39,18 @@ serve(async (req: Request) => {
       httpClient: Stripe.createFetchHttpClient(),
     })
 
-    // Get the request body
-    const { priceId, userId } = await req.json()
-    console.log('Request payload:', { priceId, userId });
-
+    // Validate required parameters
     if (!priceId || !userId) {
-      throw new Error('Missing required parameters: priceId or userId');
+      throw new Error(`Missing required parameters: ${!priceId ? 'priceId' : ''} ${!userId ? 'userId' : ''}`);
     }
 
     // Create Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    console.log('Supabase configuration exists:', {
+      hasUrl: !!supabaseUrl,
+      hasKey: !!supabaseKey
+    });
     
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase configuration missing');
@@ -136,10 +148,17 @@ serve(async (req: Request) => {
       },
     )
   } catch (error) {
-    console.error('Error in create-checkout function:', error);
+    // Enhanced error logging
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    });
+    
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'An unknown error occurred' 
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
       }),
       { 
         status: 400,
