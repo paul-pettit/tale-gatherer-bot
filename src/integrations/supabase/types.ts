@@ -118,7 +118,7 @@ export type Database = {
           package_id: string
           profile_id: string
           status: string
-          stripe_payment_id: string
+          stripe_payment_id: string | null
           stripe_session_id: string | null
           updated_at: string
         }
@@ -130,7 +130,7 @@ export type Database = {
           package_id: string
           profile_id: string
           status: string
-          stripe_payment_id: string
+          stripe_payment_id?: string | null
           stripe_session_id?: string | null
           updated_at?: string
         }
@@ -142,7 +142,7 @@ export type Database = {
           package_id?: string
           profile_id?: string
           status?: string
-          stripe_payment_id?: string
+          stripe_payment_id?: string | null
           stripe_session_id?: string | null
           updated_at?: string
         }
