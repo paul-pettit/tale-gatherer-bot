@@ -24,11 +24,14 @@ export function useCredits() {
   });
 
   const handlePurchase = async (priceId: string) => {
-    if (!user) return;
+    if (!user) {
+      toast.error('You must be logged in to make a purchase');
+      return;
+    }
 
     try {
       setIsLoading(true);
-      const response = await supabase.functions.invoke('create-checkout', {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           priceId,
           userId: user.id,
@@ -36,14 +39,19 @@ export function useCredits() {
         },
       });
 
-      if (response.error) {
-        throw new Error(response.error.message);
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message);
       }
 
-      window.location.href = response.data.url;
+      if (!data?.url) {
+        throw new Error('No checkout URL received from Stripe');
+      }
+
+      window.location.href = data.url;
     } catch (error: any) {
-      toast.error('Failed to initiate purchase');
       console.error('Purchase error:', error);
+      toast.error(error.message || 'Failed to initiate purchase. Please try again.');
     } finally {
       setIsLoading(false);
     }
