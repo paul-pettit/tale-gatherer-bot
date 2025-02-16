@@ -1,4 +1,3 @@
-
 import { useCallback, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -43,8 +42,7 @@ export function AvatarUpload({
     width: 100,
     height: 100,
     x: 0,
-    y: 0,
-    aspect: 1
+    y: 0
   });
   const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
 
