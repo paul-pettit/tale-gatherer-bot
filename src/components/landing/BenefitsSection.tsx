@@ -26,8 +26,8 @@ export function BenefitsSection() {
             <div className="bg-card rounded-lg p-6 h-full shadow-sm flex flex-col">
               <div className="mb-6 flex-shrink-0">
                 <img 
-                  src="/lovable-uploads/d84bef9b-1d17-4006-9b0d-2fad44d91efa.png" 
-                  alt="Illustration of people giving thumbs up with a coffee cup" 
+                  src="/lovable-uploads/95a28528-6720-47e1-aef0-ec4de156b711.png" 
+                  alt="Family enjoying pool time together" 
                   className="w-full h-48 object-cover rounded-lg"
                 />
               </div>
