@@ -23,7 +23,7 @@ export function useCredits() {
     },
   });
 
-  const handlePurchase = async (priceId: string) => {
+  const handlePurchase = async (packageId: string) => {
     if (!user) {
       toast.error('You must be logged in to make a purchase');
       return;
@@ -31,9 +31,11 @@ export function useCredits() {
 
     try {
       setIsLoading(true);
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
+      console.log('Sending request to create-credit-checkout with:', { packageId, userId: user.id });
+      
+      const { data, error } = await supabase.functions.invoke('create-credit-checkout', {
         body: {
-          priceId,
+          packageId,
           userId: user.id,
         },
       });
@@ -47,6 +49,7 @@ export function useCredits() {
         throw new Error('No checkout URL received from Stripe');
       }
 
+      console.log('Received checkout URL:', data.url);
       window.location.href = data.url;
     } catch (error: any) {
       console.error('Purchase error:', error);

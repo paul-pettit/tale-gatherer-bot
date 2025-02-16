@@ -6,7 +6,7 @@ import { CreditPackage } from "@/types/credits";
 
 interface CreditPackageCardProps {
   package: CreditPackage;
-  onPurchase: (priceId: string) => void;
+  onPurchase: (packageId: string) => void;
   isLoading: boolean;
 }
 
@@ -33,7 +33,7 @@ export function CreditPackageCard({ package: pkg, onPurchase, isLoading }: Credi
         </div>
         <Button
           className="w-full"
-          onClick={() => onPurchase(pkg.stripe_price_id)}
+          onClick={() => onPurchase(pkg.id)}
           disabled={isLoading}
         >
           {isLoading ? 'Processing...' : 'Purchase Now'}
