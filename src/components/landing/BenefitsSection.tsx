@@ -18,13 +18,11 @@ export function BenefitsSection() {
                   className="w-full h-48 object-cover rounded-lg"
                 />
               </div>
-              <h3 className="text-xl font-semibold mb-4 flex items-center justify-center gap-2">
-                <Users className="h-5 w-5 text-muted-foreground" />
-                Collaborative Storytelling
-              </h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-xl font-semibold mb-4">Collaborative Storytelling</h3>
+              <p className="text-muted-foreground mb-4">
                 Multiple family members can contribute to the same story, adding their unique perspectives.
               </p>
+              <Users className="h-6 w-6 text-muted-foreground mx-auto mt-auto" />
             </div>
           </div>
           <div className="text-center">
@@ -36,13 +34,11 @@ export function BenefitsSection() {
                   className="w-full h-48 object-contain rounded-lg"
                 />
               </div>
-              <h3 className="text-xl font-semibold mb-4 flex items-center justify-center gap-2">
-                <BadgeDollarSign className="h-5 w-5 text-muted-foreground" />
-                Story Incentives
-              </h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-xl font-semibold mb-4">Story Incentives</h3>
+              <p className="text-muted-foreground mb-4">
                 Encourage storytelling through gift card contributions and family rewards.
               </p>
+              <BadgeDollarSign className="h-6 w-6 text-muted-foreground mx-auto mt-auto" />
             </div>
           </div>
           <div className="text-center">
@@ -54,13 +50,11 @@ export function BenefitsSection() {
                   className="w-full h-48 object-cover rounded-lg"
                 />
               </div>
-              <h3 className="text-xl font-semibold mb-4 flex items-center justify-center gap-2">
-                <BadgeCheck className="h-5 w-5 text-muted-foreground" />
-                Private & Secure
-              </h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-xl font-semibold mb-4">Private & Secure</h3>
+              <p className="text-muted-foreground mb-4">
                 Control who sees your stories with flexible privacy settings for family sharing.
               </p>
+              <BadgeCheck className="h-6 w-6 text-muted-foreground mx-auto mt-auto" />
             </div>
           </div>
         </div>
