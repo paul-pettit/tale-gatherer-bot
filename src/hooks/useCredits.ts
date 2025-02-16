@@ -32,37 +32,54 @@ export function useCredits() {
     try {
       setIsLoading(true);
       
-      console.log('Starting purchase process for package:', packageId);
-      console.log('User ID:', user.id);
+      console.log('Initiating purchase:', {
+        packageId,
+        userId: user.id,
+      });
       
       const response = await supabase.functions.invoke<{ url: string; error?: string }>('create-credit-checkout', {
         body: {
           packageId,
           userId: user.id,
         },
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
-      if (response.error) {
-        console.error('Edge function error:', response.error);
-        throw new Error(
-          response.error.message || 
-          (response.data?.error ? JSON.stringify(response.data.error) : 'Failed to initiate purchase')
-        );
-      }
+      console.log('Edge function response:', response);
 
-      if (response.data?.error) {
-        console.error('Application error:', response.data.error);
-        throw new Error(response.data.error);
+      if (response.error) {
+        console.error('Edge function error:', {
+          error: response.error,
+          data: response.data,
+        });
+        
+        // Try to extract the most useful error message
+        const errorMessage = response.error.message || 
+          (response.data?.error ? 
+            typeof response.data.error === 'string' ? 
+              response.data.error : 
+              JSON.stringify(response.data.error)
+          ) : 'Failed to initiate purchase';
+        
+        throw new Error(errorMessage);
       }
 
       if (!response.data?.url) {
+        console.error('Missing checkout URL in response:', response);
         throw new Error('No checkout URL received from Stripe');
       }
 
       // Redirect to Stripe checkout
       window.location.href = response.data.url;
     } catch (error: any) {
-      console.error('Purchase error:', error);
+      console.error('Purchase error:', {
+        error,
+        message: error.message,
+        stack: error.stack,
+      });
+      
       toast.error(error.message || 'Failed to initiate purchase. Please try again.');
     } finally {
       setIsLoading(false);

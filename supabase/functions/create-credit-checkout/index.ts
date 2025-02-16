@@ -9,8 +9,10 @@ const corsHeaders = {
 }
 
 serve(async (req: Request) => {
-  console.log('Function invoked with method:', req.method);
-
+  // Log the full request details
+  console.log('Request method:', req.method);
+  console.log('Request headers:', Object.fromEntries(req.headers.entries()));
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, {
@@ -22,50 +24,58 @@ serve(async (req: Request) => {
   }
 
   try {
-    // Parse the request body
+    // Log the raw request body for debugging
+    const rawBody = await req.text();
+    console.log('Raw request body:', rawBody);
+    
+    // Parse the JSON body
     let body;
     try {
-      body = await req.json();
-      console.log('Request body:', JSON.stringify(body));
+      body = JSON.parse(rawBody);
+      console.log('Parsed request body:', body);
     } catch (e) {
       console.error('Failed to parse request body:', e);
-      throw new Error('Invalid request body');
+      throw new Error('Invalid JSON in request body');
     }
 
     const { packageId, userId } = body;
 
+    // Validate required fields
     if (!packageId) {
-      throw new Error('Missing packageId parameter');
+      throw new Error('Missing required field: packageId');
     }
     if (!userId) {
-      throw new Error('Missing userId parameter');
+      throw new Error('Missing required field: userId');
     }
 
-    // Verify STRIPE_SECRET_KEY is set
+    // Initialize required services
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
     if (!stripeKey) {
-      throw new Error('Stripe secret key not configured');
+      throw new Error('Stripe configuration is missing');
     }
 
-    // Initialize Stripe
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase configuration is missing');
+    }
+
+    // Log service initialization
+    console.log('Initializing services with:', {
+      hasStripeKey: !!stripeKey,
+      supabaseUrl,
+      hasSupabaseKey: !!supabaseKey
+    });
+
     const stripe = new Stripe(stripeKey, {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
-    })
+    });
 
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Supabase configuration missing');
-    }
-
-    console.log('Initializing Supabase client with URL:', supabaseUrl);
     const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
 
-    // Get the credit package details
-    console.log('Fetching credit package with ID:', packageId);
+    // Fetch credit package
+    console.log('Fetching credit package:', packageId);
     const { data: creditPackage, error: packageError } = await supabaseAdmin
       .from('credit_packages')
       .select('*')
@@ -73,17 +83,18 @@ serve(async (req: Request) => {
       .single();
 
     if (packageError) {
-      console.error('Credit package error:', packageError);
-      throw new Error(`Failed to fetch credit package: ${packageError.message}`);
+      console.error('Failed to fetch credit package:', packageError);
+      throw new Error(`Credit package error: ${packageError.message}`);
     }
 
     if (!creditPackage) {
-      throw new Error('Credit package not found');
+      throw new Error(`Credit package not found: ${packageId}`);
     }
-    console.log('Found credit package:', creditPackage);
 
-    // Get or create customer
-    console.log('Fetching profile for user:', userId);
+    console.log('Credit package found:', creditPackage);
+
+    // Get or create Stripe customer
+    console.log('Fetching user profile:', userId);
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('stripe_customer_id')
@@ -91,22 +102,21 @@ serve(async (req: Request) => {
       .single();
 
     if (profileError) {
-      console.error('Profile error:', profileError);
-      throw new Error(`Failed to fetch profile: ${profileError.message}`);
+      console.error('Failed to fetch profile:', profileError);
+      throw new Error(`Profile error: ${profileError.message}`);
     }
 
     let customerId = profile.stripe_customer_id;
 
     if (!customerId) {
-      console.log('No Stripe customer ID found, creating new customer...');
+      console.log('Creating new Stripe customer for user:', userId);
       const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
       
       if (userError || !userData.user) {
-        console.error('User data error:', userError);
-        throw new Error(`Failed to fetch user data: ${userError?.message || 'User not found'}`);
+        console.error('Failed to fetch user data:', userError);
+        throw new Error(`User data error: ${userError?.message || 'User not found'}`);
       }
 
-      console.log('Creating new Stripe customer for user:', userData.user.email);
       const customer = await stripe.customers.create({
         email: userData.user.email,
         metadata: { userId },
@@ -115,21 +125,19 @@ serve(async (req: Request) => {
       customerId = customer.id;
       console.log('Created Stripe customer:', customerId);
 
-      // Update profile with Stripe customer ID
-      console.log('Updating profile with Stripe customer ID');
       const { error: updateError } = await supabaseAdmin
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', userId);
 
       if (updateError) {
-        console.error('Profile update error:', updateError);
-        throw new Error(`Failed to update profile with customer ID: ${updateError.message}`);
+        console.error('Failed to update profile:', updateError);
+        throw new Error(`Profile update error: ${updateError.message}`);
       }
     }
 
-    console.log('Creating credit purchase record...');
-    // Create a new credit purchase record
+    // Create purchase record
+    console.log('Creating purchase record');
     const { data: purchase, error: purchaseError } = await supabaseAdmin
       .from('credit_purchases')
       .insert({
@@ -143,13 +151,11 @@ serve(async (req: Request) => {
       .single();
 
     if (purchaseError) {
-      console.error('Purchase creation error:', purchaseError);
-      throw new Error(`Failed to create purchase record: ${purchaseError.message}`);
+      console.error('Failed to create purchase record:', purchaseError);
+      throw new Error(`Purchase record error: ${purchaseError.message}`);
     }
-    console.log('Created purchase record:', purchase.id);
 
-    console.log('Creating Stripe checkout session...');
-    // Create Stripe checkout session
+    console.log('Creating Stripe checkout session');
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [{
@@ -166,19 +172,18 @@ serve(async (req: Request) => {
       },
     });
 
-    // Update purchase record with session ID
-    console.log('Updating purchase record with session ID:', session.id);
+    // Update purchase with session ID
     const { error: sessionUpdateError } = await supabaseAdmin
       .from('credit_purchases')
       .update({ stripe_session_id: session.id })
       .eq('id', purchase.id);
 
     if (sessionUpdateError) {
-      console.error('Session update error:', sessionUpdateError);
-      throw new Error(`Failed to update purchase with session ID: ${sessionUpdateError.message}`);
+      console.error('Failed to update session ID:', sessionUpdateError);
+      throw new Error(`Session update error: ${sessionUpdateError.message}`);
     }
 
-    console.log('Checkout session created successfully:', session.id);
+    console.log('Checkout session created:', session.id);
     return new Response(
       JSON.stringify({ url: session.url }),
       {
@@ -189,14 +194,17 @@ serve(async (req: Request) => {
       },
     );
   } catch (error) {
-    console.error('Function error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    console.error('Returning error response:', errorMessage);
+    console.error('Function error:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    });
     
     return new Response(
       JSON.stringify({ 
-        error: errorMessage,
-        details: error instanceof Error ? error.stack : undefined
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        details: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString()
       }),
       {
         status: 400,
