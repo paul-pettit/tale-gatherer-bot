@@ -76,90 +76,6 @@ export type Database = {
           },
         ]
       }
-      credit_packages: {
-        Row: {
-          created_at: string
-          credits: number
-          id: string
-          name: string
-          price: number
-          size: Database["public"]["Enums"]["credit_package_size"]
-          stripe_price_id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          credits: number
-          id?: string
-          name: string
-          price: number
-          size: Database["public"]["Enums"]["credit_package_size"]
-          stripe_price_id: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          credits?: number
-          id?: string
-          name?: string
-          price?: number
-          size?: Database["public"]["Enums"]["credit_package_size"]
-          stripe_price_id?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      credit_purchases: {
-        Row: {
-          amount: number
-          created_at: string
-          credits_granted: number
-          id: string
-          package_id: string
-          profile_id: string
-          status: string
-          stripe_payment_id: string
-          updated_at: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          credits_granted: number
-          id?: string
-          package_id: string
-          profile_id: string
-          status: string
-          stripe_payment_id: string
-          updated_at?: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          credits_granted?: number
-          id?: string
-          package_id?: string
-          profile_id?: string
-          status?: string
-          stripe_payment_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "credit_purchases_package_id_fkey"
-            columns: ["package_id"]
-            isOneToOne: false
-            referencedRelation: "credit_packages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "credit_purchases_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       families: {
         Row: {
           created_at: string
@@ -909,7 +825,6 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
-      credit_package_size: "small" | "medium" | "large"
       llm_model: "gpt-4o-mini" | "gpt-4o"
       profile_field_type: "text" | "number" | "select"
       prompt_type: "interview" | "story_generation"

@@ -1,7 +1,8 @@
-# MemoryStitch Project Charter
+
+# Memory Stitcher Project Charter
 
 ## Project Overview
-MemoryStitch is an AI-powered biographical storytelling platform that conducts thoughtful interviews to help users preserve their life stories in a meaningful and engaging way.
+Memory Stitcher is an AI-powered biographical storytelling platform that conducts thoughtful interviews to help users preserve their life stories in a meaningful and engaging way.
 
 ## Style Guide
 
