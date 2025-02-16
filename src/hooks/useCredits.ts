@@ -44,37 +44,25 @@ export function useCredits() {
         throw new Error('No active session found');
       }
 
-      // Instead of using supabase.functions.invoke, we'll use fetch directly
-      // This gives us more control over the request
-      const response = await fetch(
-        `${supabase.functions.url}/create-credit-checkout`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            packageId,
-            userId: user.id,
-          }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('create-credit-checkout', {
+        body: {
+          packageId,
+          userId: user.id,
+        },
+      });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        console.error('Edge function error:', result);
-        throw new Error(result.error || 'Failed to initiate purchase');
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Failed to initiate purchase');
       }
 
-      if (!result.url) {
-        console.error('Missing checkout URL in response:', result);
+      if (!data?.url) {
+        console.error('Missing checkout URL in response:', data);
         throw new Error('No checkout URL received from Stripe');
       }
 
       // Redirect to Stripe checkout
-      window.location.href = result.url;
+      window.location.href = data.url;
     } catch (error: any) {
       console.error('Purchase error:', {
         error,
