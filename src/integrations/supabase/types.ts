@@ -119,6 +119,7 @@ export type Database = {
           profile_id: string
           status: string
           stripe_payment_id: string
+          stripe_session_id: string | null
           updated_at: string
         }
         Insert: {
@@ -130,6 +131,7 @@ export type Database = {
           profile_id: string
           status: string
           stripe_payment_id: string
+          stripe_session_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -141,6 +143,7 @@ export type Database = {
           profile_id?: string
           status?: string
           stripe_payment_id?: string
+          stripe_session_id?: string | null
           updated_at?: string
         }
         Relationships: [
