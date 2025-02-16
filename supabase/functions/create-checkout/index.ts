@@ -15,21 +15,39 @@ serve(async (req: Request) => {
   }
 
   try {
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    console.log('Starting checkout process...');
+    
+    // Initialize Stripe
+    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
+    if (!stripeKey) {
+      throw new Error('Stripe secret key not configured');
+    }
+
+    const stripe = new Stripe(stripeKey, {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
     })
 
     // Get the request body
-    const { priceId, userId, mode = 'payment' } = await req.json()
+    const { priceId, userId } = await req.json()
+    console.log('Request payload:', { priceId, userId });
+
+    if (!priceId || !userId) {
+      throw new Error('Missing required parameters: priceId or userId');
+    }
 
     // Create Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase configuration missing');
+    }
+
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     // Get user profile
+    console.log('Fetching user profile...');
     const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
       .select('stripe_customer_id')
@@ -37,17 +55,20 @@ serve(async (req: Request) => {
       .single()
 
     if (profileError) {
-      throw new Error('Error fetching user profile')
+      console.error('Profile fetch error:', profileError);
+      throw new Error('Error fetching user profile');
     }
 
     let customerId = profile.stripe_customer_id
 
     // If no customer ID exists, create a new customer
     if (!customerId) {
-      const { data: userData } = await supabaseClient.auth.admin.getUserById(userId)
+      console.log('Creating new Stripe customer...');
+      const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserById(userId)
       
-      if (!userData.user) {
-        throw new Error('User not found')
+      if (userError || !userData.user) {
+        console.error('User fetch error:', userError);
+        throw new Error('User not found');
       }
 
       const customer = await stripe.customers.create({
@@ -60,13 +81,19 @@ serve(async (req: Request) => {
       customerId = customer.id
 
       // Update profile with Stripe customer ID
-      await supabaseClient
+      const { error: updateError } = await supabaseClient
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', userId)
+
+      if (updateError) {
+        console.error('Profile update error:', updateError);
+        throw new Error('Failed to update profile with Stripe customer ID');
+      }
     }
 
     // Get the credit package details
+    console.log('Fetching credit package details...');
     const { data: creditPackage, error: packageError } = await supabaseClient
       .from('credit_packages')
       .select('*')
@@ -74,10 +101,12 @@ serve(async (req: Request) => {
       .single()
 
     if (packageError || !creditPackage) {
-      throw new Error('Credit package not found')
+      console.error('Package fetch error:', packageError);
+      throw new Error('Credit package not found');
     }
 
     // Create a checkout session
+    console.log('Creating Stripe checkout session...');
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [
@@ -96,6 +125,7 @@ serve(async (req: Request) => {
       },
     })
 
+    console.log('Checkout session created successfully');
     return new Response(
       JSON.stringify({ url: session.url }),
       { 
@@ -106,9 +136,11 @@ serve(async (req: Request) => {
       },
     )
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in create-checkout function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'An unknown error occurred' 
+      }),
       { 
         status: 400,
         headers: {
