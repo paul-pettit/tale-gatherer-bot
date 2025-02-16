@@ -71,49 +71,31 @@ export default function ProfilePage() {
       // First get all the field IDs
       const { data: fields, error: fieldsError } = await supabase
         .from('profile_fields')
-        .select('id, name');
+        .select('id, name')
+        .in('name', ['first_name', 'age', 'hometown', 'gender']);
 
       if (fieldsError) throw fieldsError;
 
-      // Prepare the values for each field
-      const updates = fields?.map(field => {
-        let value = '';
-        switch (field.name) {
-          case 'first_name':
-            value = firstName;
-            break;
-          case 'age':
-            value = age;
-            break;
-          case 'hometown':
-            value = hometown;
-            break;
-          case 'gender':
-            value = gender;
-            break;
+      for (const field of fields || []) {
+        const value = field.name === 'first_name' ? firstName :
+                     field.name === 'age' ? age :
+                     field.name === 'hometown' ? hometown :
+                     field.name === 'gender' ? gender : null;
+
+        if (value !== null) {
+          const { error } = await supabase
+            .from('profile_field_values')
+            .upsert({
+              profile_id: user.id,
+              field_id: field.id,
+              value: value
+            }, {
+              onConflict: 'profile_id,field_id'
+            });
+
+          if (error) throw error;
         }
-
-        return {
-          profile_id: user.id,
-          field_id: field.id,
-          value: value
-        };
-      }) || [];
-
-      // Delete existing values first
-      const { error: deleteError } = await supabase
-        .from('profile_field_values')
-        .delete()
-        .eq('profile_id', user.id);
-
-      if (deleteError) throw deleteError;
-
-      // Insert new values
-      const { error: insertError } = await supabase
-        .from('profile_field_values')
-        .insert(updates);
-
-      if (insertError) throw insertError;
+      }
 
       toast.success("Profile updated successfully");
       setIsEditing(false);
@@ -128,7 +110,7 @@ export default function ProfilePage() {
     const field = profileData?.fieldValues?.find(
       (f) => f.profile_fields?.name === fieldName
     );
-    return field?.value || "";
+    return field?.value || "Not set";
   };
 
   return (
