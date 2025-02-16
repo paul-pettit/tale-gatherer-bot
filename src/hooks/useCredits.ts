@@ -31,28 +31,35 @@ export function useCredits() {
 
     try {
       setIsLoading(true);
-      console.log('Sending request to create-credit-checkout with:', { packageId, userId: user.id });
       
-      const { data, error } = await supabase.functions.invoke('create-credit-checkout', {
+      // Debug log
+      console.log('Starting purchase process for package:', packageId);
+      
+      // Try to invoke the function
+      console.log('Attempting to invoke create-credit-checkout function...');
+      const { data, error } = await supabase.functions.invoke<{ url: string }>('create-credit-checkout', {
         body: {
           packageId,
           userId: user.id,
         },
       });
 
+      // Log any errors
       if (error) {
-        console.error('Edge function error:', error);
-        throw new Error(error.message);
+        console.error('Detailed error:', error);
+        throw error;
       }
+
+      // Log success
+      console.log('Successfully received response:', data);
 
       if (!data?.url) {
         throw new Error('No checkout URL received from Stripe');
       }
 
-      console.log('Received checkout URL:', data.url);
       window.location.href = data.url;
     } catch (error: any) {
-      console.error('Purchase error:', error);
+      console.error('Full error object:', error);
       toast.error(error.message || 'Failed to initiate purchase. Please try again.');
     } finally {
       setIsLoading(false);
