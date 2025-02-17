@@ -8,35 +8,48 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true });
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true
+});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  // Initialize state outside of any conditional blocks
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error checking auth session:', error);
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
 
     // Listen for changes on auth state (sign in, sign out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
+      setUser(session?.user ?? null);
+      setLoading(false);
 
       // If the user just confirmed their email, redirect to verification success
-      if (currentUser?.email_confirmed_at && window.location.pathname === '/auth/verification-pending') {
+      if (session?.user?.email_confirmed_at && window.location.pathname === '/auth/verification-pending') {
         window.location.href = '/auth/verification-success';
       }
-
-      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
+  // Always return the context provider
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {children}
@@ -46,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

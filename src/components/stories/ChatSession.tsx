@@ -7,6 +7,7 @@ import { useChat } from "@/hooks/useChat"
 import { MessageInput } from "./MessageInput"
 import { ChatMessages } from "./ChatMessages"
 import { toast } from "sonner"
+import { supabase } from "@/integrations/supabase/client"
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 
 interface ChatSessionProps {
