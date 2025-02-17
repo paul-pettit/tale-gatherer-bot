@@ -23,7 +23,7 @@ export default function StoryDetailPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from('stories')
-        .select('*, questions(question)')
+        .select('*, questions(question, category)')
         .eq('id', id)
         .single()
       return data
@@ -69,8 +69,11 @@ export default function StoryDetailPage() {
     )
   }
 
+  // Format the title to remove the category prefix
+  const displayTitle = story.title.replace(`Story about ${story.questions?.category}`, story.questions?.category || '')
+
   return (
-    <div className="container mx-auto p-8">
+    <div className="container mx-auto px-4 py-12 max-w-4xl">
       <div className="mb-8">
         <Button
           variant="ghost"
@@ -82,10 +85,15 @@ export default function StoryDetailPage() {
         </Button>
       </div>
 
-      <Card className="max-w-4xl mx-auto">
-        <CardHeader>
+      <Card className="bg-card border-none shadow-lg">
+        <CardHeader className="space-y-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl">{story.title}</CardTitle>
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">
+                {story.questions?.category}
+              </p>
+              <CardTitle className="text-3xl font-serif">{displayTitle}</CardTitle>
+            </div>
             {!isEditing && user?.id === story.author_id && (
               <Button variant="ghost" onClick={() => setIsEditing(true)}>
                 <Edit className="h-4 w-4 mr-2" />
@@ -93,7 +101,7 @@ export default function StoryDetailPage() {
               </Button>
             )}
           </div>
-          <div className="flex items-center text-sm text-muted-foreground mt-2">
+          <div className="flex items-center text-sm text-muted-foreground">
             <Calendar className="h-4 w-4 mr-1" />
             {formatDistanceToNow(new Date(story.created_at), { addSuffix: true })}
           </div>
@@ -120,9 +128,13 @@ export default function StoryDetailPage() {
               onCancel={() => setIsEditing(false)}
             />
           ) : (
-            <div className="prose prose-sm max-w-none">
-              {story.content.split('\n').map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
+            <div className="prose prose-lg max-w-none dark:prose-invert">
+              {story.content.split('\n\n').map((paragraph, index) => (
+                paragraph ? (
+                  <p key={index} className="mb-6 leading-relaxed">
+                    {paragraph.trim()}
+                  </p>
+                ) : null
               ))}
             </div>
           )}
