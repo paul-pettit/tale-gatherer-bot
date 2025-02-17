@@ -9,6 +9,7 @@ import { ChatMessages } from "./ChatMessages"
 import { toast } from "sonner"
 import { supabase } from "@/integrations/supabase/client"
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { PreviewDialog } from "./PreviewDialog"
 
 interface ChatSessionProps {
   sessionId: string
@@ -19,6 +20,8 @@ interface ChatSessionProps {
 export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessionProps) {
   const [newMessage, setNewMessage] = useState('')
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false)
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false)
+  const [previewContent, setPreviewContent] = useState('')
   const { user } = useAuth()
   const { messages, isLoading, isFinishing, sendMessage, finishStory } = useChat(sessionId, question)
 
@@ -29,12 +32,15 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
 
       const { data: session } = await supabase
         .from('chat_sessions')
-        .select('status, last_error')
+        .select('status, last_error, preview_content')
         .eq('id', sessionId)
-        .single()
+        .maybeSingle()
 
       if (session?.status === 'failed') {
         setShowRecoveryDialog(true)
+      } else if (session?.preview_content) {
+        setPreviewContent(session.preview_content)
+        setShowPreviewDialog(true)
       }
     }
 
@@ -52,9 +58,58 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
   const handleFinish = async () => {
     try {
       const storyContent = await finishStory()
-      onStoryComplete(storyContent)
+      
+      // Save preview content and update session status
+      await supabase
+        .from('chat_sessions')
+        .update({ 
+          preview_content: storyContent,
+          status: 'preview'
+        })
+        .eq('id', sessionId)
+
+      setPreviewContent(storyContent)
+      setShowPreviewDialog(true)
     } catch (error) {
       // Error is already handled in the hook
+    }
+  }
+
+  const handleStoryDelete = async () => {
+    try {
+      await supabase
+        .from('chat_sessions')
+        .update({ 
+          status: 'failed',
+          last_error: 'User deleted story during preview'
+        })
+        .eq('id', sessionId)
+
+      setShowPreviewDialog(false)
+      toast.success('Story deleted')
+      window.location.href = '/stories'
+    } catch (error) {
+      console.error('Error deleting story:', error)
+      toast.error('Failed to delete story')
+    }
+  }
+
+  const handleStorySave = async (title: string, content: string) => {
+    try {
+      await supabase
+        .from('chat_sessions')
+        .update({ 
+          status: 'completed',
+          preview_content: content
+        })
+        .eq('id', sessionId)
+
+      onStoryComplete(content)
+      setShowPreviewDialog(false)
+      toast.success('Story saved to library')
+    } catch (error) {
+      console.error('Error saving story:', error)
+      toast.error('Failed to save story')
     }
   }
 
@@ -100,7 +155,7 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
               className="w-full"
               disabled={isLoading || isFinishing || messages.length < 4}
             >
-              {isFinishing ? "Generating Story..." : "Finish & Generate Story"}
+              {isFinishing ? "Generating Story..." : "Finish & Preview Story"}
             </Button>
           </div>
         </CardContent>
@@ -125,6 +180,15 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <PreviewDialog
+        isOpen={showPreviewDialog}
+        onClose={() => setShowPreviewDialog(false)}
+        previewContent={previewContent}
+        title={`Story about ${question}`}
+        onSave={handleStorySave}
+        onDelete={handleStoryDelete}
+      />
     </>
   )
 }
