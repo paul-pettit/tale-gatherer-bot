@@ -69,27 +69,18 @@ export function useChat(sessionId: string, question: string) {
         })
 
       // Get AI response
-      const response = await fetch('/api/ai-interviewer', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-        },
-        body: JSON.stringify({
+      const response = await supabase.functions.invoke('ai-interviewer', {
+        body: {
           message: newMessage,
           sessionId,
           context: question,
           isFinishing: false
-        }),
+        },
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to get AI response')
-      }
-
-      const { message: aiMessage, error } = await response.json()
-      if (error) throw new Error(error)
-
+      if (response.error) throw new Error(response.error.message)
+      
+      const aiMessage = response.data.message
       setMessages(prev => [...prev, { role: 'assistant', content: aiMessage }])
     } catch (error) {
       console.error('Error in chat:', error)
@@ -109,26 +100,18 @@ export function useChat(sessionId: string, question: string) {
 
     setIsFinishing(true)
     try {
-      const response = await fetch('/api/ai-interviewer', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-        },
-        body: JSON.stringify({
+      const response = await supabase.functions.invoke('ai-interviewer', {
+        body: {
           message: "Please help me craft a coherent story from our conversation. Incorporate the details, emotions, and reflections we've discussed into a well-structured narrative.",
           sessionId,
           context: question,
           isFinishing: true
-        }),
+        },
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to generate story')
-      }
+      if (response.error) throw new Error(response.error.message)
 
-      const { message: storyContent } = await response.json()
-      return storyContent
+      return response.data.message
     } catch (error) {
       console.error('Error generating story:', error)
       toast.error('Failed to generate story')
