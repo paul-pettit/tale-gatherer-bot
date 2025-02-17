@@ -18,6 +18,8 @@ import NotFound from "./pages/NotFound";
 import FamiliesPage from "./pages/families";
 import FamilyDetailsPage from "./pages/families/[id]";
 import NewStoryPage from "./pages/stories/new";
+import StoryLibraryPage from "./pages/stories";
+import StoryDetailPage from "./pages/stories/[id]";
 import ProfilePage from "./pages/profile";
 import AdminPage from "./pages/admin";
 import CreditsPage from "./pages/credits";
@@ -51,6 +53,8 @@ const App = () => (
                     <Route path="/admin" element={<AdminPage />} />
                     <Route path="/credits" element={<CreditsPage />} />
                     <Route path="/credits/success" element={<CreditsPurchaseSuccess />} />
+                    <Route path="/stories" element={<StoryLibraryPage />} />
+                    <Route path="/stories/:id" element={<StoryDetailPage />} />
                     <Route
                       path="/stories/new"
                       element={

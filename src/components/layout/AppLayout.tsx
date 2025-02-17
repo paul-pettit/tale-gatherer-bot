@@ -15,7 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFreeTier } from "@/hooks/useFreeTier";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Home, PenSquare, User, LogOut, Shield, Gem } from "lucide-react";
+import { Home, PenSquare, User, LogOut, Shield, Gem, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -72,6 +72,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'New Story', href: '/stories/new', icon: PenSquare },
+    { name: 'Story Library', href: '/stories', icon: BookOpen },
     { name: 'Profile', href: '/profile', icon: User },
     ...(isAdmin ? [{ name: 'Admin', href: '/admin', icon: Shield }] : []),
   ];
