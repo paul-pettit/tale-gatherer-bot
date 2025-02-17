@@ -59,32 +59,41 @@ export function useChat(sessionId: string, question: string) {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/interview-chat', {
+      // Save user message
+      await supabase
+        .from('chat_messages')
+        .insert({
+          session_id: sessionId,
+          role: 'user',
+          content: newMessage
+        })
+
+      // Get AI response
+      const response = await fetch('/api/ai-interviewer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${await supabase.auth.getSession()}`
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
         },
         body: JSON.stringify({
           message: newMessage,
           sessionId,
-          context: question
+          context: question,
+          isFinishing: false
         }),
       })
 
       if (!response.ok) {
-        throw new Error(`Failed to get response: ${response.statusText}`)
+        throw new Error('Failed to get AI response')
       }
 
-      const { message: aiResponse, error } = await response.json()
-      
+      const { message: aiMessage, error } = await response.json()
       if (error) throw new Error(error)
 
-      const assistantMessage = { role: 'assistant' as const, content: aiResponse }
-      setMessages(prev => [...prev, assistantMessage])
+      setMessages(prev => [...prev, { role: 'assistant', content: aiMessage }])
     } catch (error) {
       console.error('Error in chat:', error)
-      toast.error('Failed to get AI response. Please try again.')
+      toast.error('Failed to get AI response')
       // Remove the user message if we failed to get a response
       setMessages(prev => prev.slice(0, -1))
     } finally {
@@ -100,11 +109,11 @@ export function useChat(sessionId: string, question: string) {
 
     setIsFinishing(true)
     try {
-      const response = await fetch('/api/interview-chat', {
+      const response = await fetch('/api/ai-interviewer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${await supabase.auth.getSession()}`
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
         },
         body: JSON.stringify({
           message: "Please help me craft a coherent story from our conversation. Incorporate the details, emotions, and reflections we've discussed into a well-structured narrative.",
@@ -114,13 +123,15 @@ export function useChat(sessionId: string, question: string) {
         }),
       })
 
-      if (!response.ok) throw new Error('Failed to generate story')
-      
+      if (!response.ok) {
+        throw new Error('Failed to generate story')
+      }
+
       const { message: storyContent } = await response.json()
       return storyContent
     } catch (error) {
       console.error('Error generating story:', error)
-      toast.error('Failed to generate story. Please try again.')
+      toast.error('Failed to generate story')
       throw error
     } finally {
       setIsFinishing(false)
