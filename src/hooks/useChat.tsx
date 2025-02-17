@@ -12,7 +12,7 @@ export function useChat(sessionId: string, question: string) {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isFinishing, setIsFinishing] = useState(false)
-
+  
   // Load initial messages
   useEffect(() => {
     const loadMessages = async () => {
@@ -81,6 +81,16 @@ export function useChat(sessionId: string, question: string) {
       if (response.error) throw new Error(response.error.message)
       
       const aiMessage = response.data.message
+      
+      // Save AI message
+      await supabase
+        .from('chat_messages')
+        .insert({
+          session_id: sessionId,
+          role: 'assistant',
+          content: aiMessage
+        })
+
       setMessages(prev => [...prev, { role: 'assistant', content: aiMessage }])
     } catch (error) {
       console.error('Error in chat:', error)
@@ -100,6 +110,14 @@ export function useChat(sessionId: string, question: string) {
 
     setIsFinishing(true)
     try {
+      // First, update the session status
+      const { error: sessionError } = await supabase
+        .from('chat_sessions')
+        .update({ status: 'finishing' })
+        .eq('id', sessionId)
+
+      if (sessionError) throw sessionError
+
       const response = await supabase.functions.invoke('ai-interviewer', {
         body: {
           message: "Please help me craft a coherent story from our conversation. Incorporate the details, emotions, and reflections we've discussed into a well-structured narrative.",
@@ -111,9 +129,24 @@ export function useChat(sessionId: string, question: string) {
 
       if (response.error) throw new Error(response.error.message)
 
+      // Update session status to completed
+      await supabase
+        .from('chat_sessions')
+        .update({ status: 'completed' })
+        .eq('id', sessionId)
+
       return response.data.message
     } catch (error) {
       console.error('Error generating story:', error)
+      // Update session status to failed
+      await supabase
+        .from('chat_sessions')
+        .update({ 
+          status: 'failed',
+          last_error: error instanceof Error ? error.message : 'Unknown error'
+        })
+        .eq('id', sessionId)
+
       toast.error('Failed to generate story')
       throw error
     } finally {

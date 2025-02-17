@@ -661,12 +661,14 @@ export type Database = {
       stories: {
         Row: {
           author_id: string
+          chat_session_id: string | null
           content: string
           created_at: string
           family_id: string | null
           id: string
           is_shared_with_family: boolean | null
           last_auto_save: string | null
+          last_message_processed: string | null
           question_id: string | null
           status: Database["public"]["Enums"]["story_status"] | null
           title: string
@@ -675,12 +677,14 @@ export type Database = {
         }
         Insert: {
           author_id: string
+          chat_session_id?: string | null
           content: string
           created_at?: string
           family_id?: string | null
           id?: string
           is_shared_with_family?: boolean | null
           last_auto_save?: string | null
+          last_message_processed?: string | null
           question_id?: string | null
           status?: Database["public"]["Enums"]["story_status"] | null
           title: string
@@ -689,12 +693,14 @@ export type Database = {
         }
         Update: {
           author_id?: string
+          chat_session_id?: string | null
           content?: string
           created_at?: string
           family_id?: string | null
           id?: string
           is_shared_with_family?: boolean | null
           last_auto_save?: string | null
+          last_message_processed?: string | null
           question_id?: string | null
           status?: Database["public"]["Enums"]["story_status"] | null
           title?: string
@@ -707,6 +713,13 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stories_chat_session_id_fkey"
+            columns: ["chat_session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
             referencedColumns: ["id"]
           },
           {
