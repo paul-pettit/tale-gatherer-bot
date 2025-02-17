@@ -5,9 +5,17 @@ export function BenefitsSection() {
   return (
     <div className="py-24 bg-background">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-[#2C1810]">
-          Tell Your Story Well
-        </h2>
+        <div className="relative mb-16 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-[#2C1810] mb-3 relative z-10">
+            Tell Your Story Well
+          </h2>
+          <div className="absolute w-32 h-32 bg-primary/30 rounded-full blur-3xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -z-0" />
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="h-[2px] w-12 bg-[#2C1810]/20" />
+            <BookOpen className="w-8 h-8 text-[#2C1810]" />
+            <div className="h-[2px] w-12 bg-[#2C1810]/20" />
+          </div>
+        </div>
 
         {/* New explanation section */}
         <div className="max-w-4xl mx-auto mb-20">
@@ -17,24 +25,27 @@ export function BenefitsSection() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
             <div className="flex flex-col items-center group hover:transform hover:scale-105 transition-transform duration-300">
-              <div className="w-20 h-20 rounded-full bg-[hsl(26,60%,85%)] flex items-center justify-center mb-6 shadow-lg group-hover:bg-[hsl(26,60%,80%)] transition-colors">
-                <Pen className="w-10 h-10 text-[#2C1810]" />
+              <div className="w-20 h-20 rounded-full bg-[hsl(26,60%,85%)] flex items-center justify-center mb-6 shadow-lg group-hover:bg-[hsl(26,60%,80%)] transition-colors relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
+                <Pen className="w-10 h-10 text-[#2C1810] relative z-10" />
               </div>
               <h3 className="text-xl font-semibold mb-3 text-[#2C1810]">Guided Writing</h3>
               <p className="text-muted-foreground leading-relaxed">Interactive conversations that help you unlock and shape your memories</p>
             </div>
             
             <div className="flex flex-col items-center group hover:transform hover:scale-105 transition-transform duration-300">
-              <div className="w-20 h-20 rounded-full bg-[hsl(26,60%,85%)] flex items-center justify-center mb-6 shadow-lg group-hover:bg-[hsl(26,60%,80%)] transition-colors">
-                <Heart className="w-10 h-10 text-[#2C1810]" />
+              <div className="w-20 h-20 rounded-full bg-[hsl(26,60%,85%)] flex items-center justify-center mb-6 shadow-lg group-hover:bg-[hsl(26,60%,80%)] transition-colors relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse delay-150" />
+                <Heart className="w-10 h-10 text-[#2C1810] relative z-10" />
               </div>
               <h3 className="text-xl font-semibold mb-3 text-[#2C1810]">Family Connection</h3>
               <p className="text-muted-foreground leading-relaxed">Share stories with loved ones and preserve your family's legacy</p>
             </div>
             
             <div className="flex flex-col items-center group hover:transform hover:scale-105 transition-transform duration-300">
-              <div className="w-20 h-20 rounded-full bg-[hsl(26,60%,85%)] flex items-center justify-center mb-6 shadow-lg group-hover:bg-[hsl(26,60%,80%)] transition-colors">
-                <BookOpen className="w-10 h-10 text-[#2C1810]" />
+              <div className="w-20 h-20 rounded-full bg-[hsl(26,60%,85%)] flex items-center justify-center mb-6 shadow-lg group-hover:bg-[hsl(26,60%,80%)] transition-colors relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse delay-300" />
+                <BookOpen className="w-10 h-10 text-[#2C1810] relative z-10" />
               </div>
               <h3 className="text-xl font-semibold mb-3 text-[#2C1810]">Living Library</h3>
               <p className="text-muted-foreground leading-relaxed">Build a collection of meaningful stories that grows with your family</p>
