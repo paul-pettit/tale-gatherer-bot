@@ -34,21 +34,23 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Check if user has enough credits before proceeding
-    const { data: profile, error: profileError } = await supabaseClient
-      .from('profiles')
-      .select('monthly_story_tokens, purchased_story_credits')
-      .eq('id', userId)
-      .single();
+    // Check if user has enough credits only when it's their first message
+    if (messages.length === 1 && messages[0].role === 'assistant') {
+      const { data: profile, error: profileError } = await supabaseClient
+        .from('profiles')
+        .select('monthly_story_tokens, purchased_story_credits')
+        .eq('id', userId)
+        .single();
 
-    if (profileError) {
-      throw new Error(`Failed to fetch user profile: ${profileError.message}`);
-    }
+      if (profileError) {
+        throw new Error(`Failed to fetch user profile: ${profileError.message}`);
+      }
 
-    const totalCredits = (profile.monthly_story_tokens || 0) + (profile.purchased_story_credits || 0);
-    
-    if (totalCredits <= 0) {
-      throw new Error('Insufficient credits to continue the conversation');
+      const totalCredits = (profile.monthly_story_tokens || 0) + (profile.purchased_story_credits || 0);
+      
+      if (totalCredits <= 0) {
+        throw new Error('Insufficient credits to continue the conversation');
+      }
     }
 
     const { data: systemPrompts, error: promptError } = await supabaseClient
@@ -62,6 +64,13 @@ serve(async (req) => {
     }
 
     const openai = new OpenAI({ apiKey: openAiKey });
+
+    // Get user profile for system prompt context
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
 
     // Format system prompt with user context
     const systemPrompt = systemPrompts.content
@@ -89,22 +98,23 @@ serve(async (req) => {
       throw new Error('No response received from AI');
     }
 
-    // Only deduct credits and log usage on successful completion
-    const { error: creditError } = await supabaseClient
-      .from('profiles')
-      .update({
-        monthly_story_tokens: profile.monthly_story_tokens > 0 
-          ? profile.monthly_story_tokens - 1 
-          : profile.monthly_story_tokens,
-        purchased_story_credits: profile.monthly_story_tokens > 0 
-          ? profile.purchased_story_credits 
-          : profile.purchased_story_credits - 1
-      })
-      .eq('id', userId);
+    // Only deduct credits on first message
+    if (messages.length === 1 && messages[0].role === 'assistant') {
+      const { error: creditError } = await supabaseClient
+        .from('profiles')
+        .update({
+          monthly_story_tokens: profile.monthly_story_tokens > 0 
+            ? profile.monthly_story_tokens - 1 
+            : profile.monthly_story_tokens,
+          purchased_story_credits: profile.monthly_story_tokens > 0 
+            ? profile.purchased_story_credits 
+            : profile.purchased_story_credits - 1
+        })
+        .eq('id', userId);
 
-    if (creditError) {
-      console.error('Error updating credits:', creditError);
-      // Continue anyway as we got a valid response
+      if (creditError) {
+        throw new Error('Failed to update credits');
+      }
     }
 
     // Log successful prompt usage
