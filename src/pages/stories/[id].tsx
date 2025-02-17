@@ -85,6 +85,8 @@ export default function StoryDetailPage() {
         </Button>
       </div>
 
+      <h1 className="text-4xl font-bold mb-8 font-serif">{displayTitle}</h1>
+
       <Card className="bg-card border-none shadow-lg">
         <CardHeader className="space-y-4">
           <div className="flex items-center justify-between">
@@ -92,7 +94,6 @@ export default function StoryDetailPage() {
               <p className="text-sm font-medium text-muted-foreground">
                 {story.questions?.category}
               </p>
-              <CardTitle className="text-3xl font-serif">{displayTitle}</CardTitle>
             </div>
             {!isEditing && user?.id === story.author_id && (
               <Button variant="ghost" onClick={() => setIsEditing(true)}>

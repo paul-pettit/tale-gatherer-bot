@@ -1,7 +1,7 @@
 
 import * as React from "react"
 import {
-  Pagination as PaginationRoot,
+  Pagination,
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
@@ -20,7 +20,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1)
 
   return (
-    <PaginationRoot>
+    <Pagination>
       <PaginationContent>
         {currentPage > 1 && (
           <PaginationItem>
@@ -45,13 +45,13 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
           </PaginationItem>
         )}
       </PaginationContent>
-    </PaginationRoot>
+    </Pagination>
   )
 }
 
 // Add base Pagination components to the export
 export {
-  PaginationRoot,
+  Pagination,
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
