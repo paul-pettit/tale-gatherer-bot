@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
+import { useAuth } from "@/hooks/useAuth"
 
 interface Message {
   role: 'user' | 'assistant'
@@ -12,6 +13,7 @@ export function useChat(sessionId: string, question: string) {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isFinishing, setIsFinishing] = useState(false)
+  const { user } = useAuth()
   
   // Load initial messages
   useEffect(() => {
@@ -52,13 +54,22 @@ export function useChat(sessionId: string, question: string) {
   }, [sessionId, question])
 
   const sendMessage = async (newMessage: string) => {
-    if (!newMessage.trim() || isLoading) return
+    if (!newMessage.trim() || isLoading || !user) return
 
     const userMessage = { role: 'user' as const, content: newMessage }
     setMessages(prev => [...prev, userMessage])
     setIsLoading(true)
 
     try {
+      // Get story ID from chat session
+      const { data: session, error: sessionError } = await supabase
+        .from('chat_sessions')
+        .select('story_id')
+        .eq('id', sessionId)
+        .single()
+
+      if (sessionError) throw sessionError
+
       // Save user message
       await supabase
         .from('chat_messages')
@@ -72,15 +83,16 @@ export function useChat(sessionId: string, question: string) {
       const response = await supabase.functions.invoke('ai-interviewer', {
         body: {
           message: newMessage,
-          sessionId,
+          messages: messages,
           context: question,
-          isFinishing: false
+          userId: user.id,
+          storyId: session.story_id
         },
       })
 
       if (response.error) throw new Error(response.error.message)
       
-      const aiMessage = response.data.message
+      const aiMessage = response.data.answer
       
       // Save AI message
       await supabase
@@ -110,19 +122,30 @@ export function useChat(sessionId: string, question: string) {
 
     setIsFinishing(true)
     try {
+      // Get story ID from chat session
+      const { data: session, error: sessionError } = await supabase
+        .from('chat_sessions')
+        .select('story_id')
+        .eq('id', sessionId)
+        .single()
+
+      if (sessionError) throw sessionError
+
       // First, update the session status
-      const { error: sessionError } = await supabase
+      const { error: updateError } = await supabase
         .from('chat_sessions')
         .update({ status: 'finishing' })
         .eq('id', sessionId)
 
-      if (sessionError) throw sessionError
+      if (updateError) throw updateError
 
       const response = await supabase.functions.invoke('ai-interviewer', {
         body: {
           message: "Please help me craft a coherent story from our conversation. Incorporate the details, emotions, and reflections we've discussed into a well-structured narrative.",
-          sessionId,
+          messages,
           context: question,
+          userId: user?.id,
+          storyId: session.story_id,
           isFinishing: true
         },
       })
@@ -135,7 +158,7 @@ export function useChat(sessionId: string, question: string) {
         .update({ status: 'completed' })
         .eq('id', sessionId)
 
-      return response.data.message
+      return response.data.answer
     } catch (error) {
       console.error('Error generating story:', error)
       // Update session status to failed
