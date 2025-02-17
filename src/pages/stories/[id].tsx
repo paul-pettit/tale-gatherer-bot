@@ -25,7 +25,7 @@ export default function StoryDetailPage() {
         .from('stories')
         .select('*, questions(question, category)')
         .eq('id', id)
-        .single()
+        .maybeSingle()
       return data
     },
   })
@@ -35,20 +35,23 @@ export default function StoryDetailPage() {
     if (!story || !user) return
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('stories')
         .update({
           title: story.title,
           content: story.content,
         })
         .eq('id', story.id)
+        .eq('author_id', user.id) // Add this to ensure we only update user's own story
+        .select() // Add this to get the updated record
+        .single() // Ensure we only get one row back
 
       if (error) throw error
 
       toast.success('Story updated successfully')
       setIsEditing(false)
-    } catch (error) {
-      toast.error('Failed to update story')
+    } catch (error: any) {
+      toast.error('Failed to update story: ' + error.message)
       console.error('Error updating story:', error)
     }
   }
