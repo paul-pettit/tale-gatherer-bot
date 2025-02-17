@@ -1,4 +1,3 @@
-
 # Memory Stitcher Project Charter
 
 ## Project Overview
@@ -78,6 +77,32 @@ Memory Stitcher is an AI-powered biographical storytelling platform that conduct
 - [ ] Story revision limits
 - [x] Single-user personal family
 - [x] Upgrade path to family sharing
+
+## Future Features
+
+### Gift Story Creation (Holiday Focus)
+- [ ] Dedicated gift story creation flow
+  - Mother's Day stories
+  - Father's Day stories
+  - Grandparent stories
+  - Holiday memory collections
+- [ ] Architecture Considerations
+  - Story template system for different recipient types
+  - Gift presentation mode with special formatting
+  - Scheduled story delivery system
+  - Gift recipient preview system
+  - Story dedication and personal message feature
+  - Email notification system for gift delivery
+  - Gift tracking and delivery status
+  - Special UI elements for gift stories
+  - Recipient access management without full account requirement
+  - Gift story privacy controls
+  - Collaborative gift story creation for family members
+- [ ] Marketing Integration
+  - Holiday-specific promotional campaigns
+  - Gift card system for story credits
+  - Special holiday pricing packages
+  - Family gift bundles
 
 ## Technical Stack
 - [x] Frontend: React with TypeScript
