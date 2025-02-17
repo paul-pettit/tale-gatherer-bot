@@ -28,9 +28,18 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
+type QuestionCategory = 
+  | "childhood_and_roots"
+  | "family_and_relationships"
+  | "first_love"
+  | "high_school_and_early_years"
+  | "career_and_aspirations"
+  | "risk_and_growth"
+  | "reflections_and_legacy";
+
 interface Question {
   id: string;
-  category: string;
+  category: QuestionCategory;
   question: string;
   description: string | null;
   created_at: string;
@@ -40,7 +49,7 @@ interface QuestionsTableProps {
   questions: Question[];
 }
 
-const CATEGORIES = [
+const CATEGORIES: { value: QuestionCategory; label: string }[] = [
   { value: 'childhood_and_roots', label: 'Childhood and Roots' },
   { value: 'family_and_relationships', label: 'Family and Relationships' },
   { value: 'first_love', label: 'First Love' },
@@ -52,10 +61,10 @@ const CATEGORIES = [
 
 export function QuestionsTable({ questions: initialQuestions }: QuestionsTableProps) {
   const { toast } = useToast();
-  const [questions, setQuestions] = useState(initialQuestions);
+  const [questions, setQuestions] = useState<Question[]>(initialQuestions);
   const [newQuestion, setNewQuestion] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<QuestionCategory | "">("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,11 +82,11 @@ export function QuestionsTable({ questions: initialQuestions }: QuestionsTablePr
     try {
       const { data, error } = await supabase
         .from('questions')
-        .insert([{
+        .insert({
           category: selectedCategory,
           question: newQuestion,
           description: newDescription || null,
-        }])
+        })
         .select()
         .single();
 
@@ -128,7 +137,7 @@ export function QuestionsTable({ questions: initialQuestions }: QuestionsTablePr
           <div className="space-y-2">
             <Select
               value={selectedCategory}
-              onValueChange={setSelectedCategory}
+              onValueChange={(value: QuestionCategory) => setSelectedCategory(value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select category" />
