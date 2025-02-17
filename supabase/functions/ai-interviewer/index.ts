@@ -14,47 +14,51 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const startTime = Date.now();
+  let supabaseClient: any;
+
   try {
     const openAiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openAiKey) {
       throw new Error('OpenAI API key not configured');
     }
 
-    const { message, context, messages, userId, storyId } = await req.json();
+    const { message, context, messages, userId, storyId, isFinishing } = await req.json();
     if (!message || !userId || !storyId) {
       throw new Error('Missing required parameters');
     }
 
     // Create Supabase client
-    const supabaseClient = createClient(
+    supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get user profile for context
+    // Check if user has enough credits before proceeding
     const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
-      .select('first_name, age, hometown, gender')
+      .select('monthly_story_tokens, purchased_story_credits')
       .eq('id', userId)
-      .maybeSingle();
+      .single();
 
     if (profileError) {
       throw new Error(`Failed to fetch user profile: ${profileError.message}`);
     }
 
-    // Get system prompt
+    const totalCredits = (profile.monthly_story_tokens || 0) + (profile.purchased_story_credits || 0);
+    
+    if (totalCredits <= 0) {
+      throw new Error('Insufficient credits to continue the conversation');
+    }
+
     const { data: systemPrompts, error: promptError } = await supabaseClient
       .from('system_prompts')
       .select('content')
       .eq('type', 'interview')
       .maybeSingle();
 
-    if (promptError) {
-      throw new Error(`Failed to fetch system prompt: ${promptError.message}`);
-    }
-
-    if (!systemPrompts?.content) {
-      throw new Error('System prompt not found');
+    if (promptError || !systemPrompts?.content) {
+      throw new Error('Failed to fetch system prompt');
     }
 
     const openai = new OpenAI({ apiKey: openAiKey });
@@ -67,8 +71,6 @@ serve(async (req) => {
       .replace('${hometown}', profile?.hometown || '')
       .replace('${gender}', profile?.gender || '');
 
-    const startTime = Date.now();
-
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -77,13 +79,35 @@ serve(async (req) => {
         { role: 'user', content: message }
       ],
       temperature: 0.7,
-      max_tokens: 500,
+      max_tokens: isFinishing ? 2000 : 500,
     });
 
     const endTime = Date.now();
-    const answer = response.choices[0]?.message?.content || 'I apologize, but I am unable to continue the conversation at this moment.';
+    const answer = response.choices[0]?.message?.content;
     
-    // Log the prompt usage with detailed timing
+    if (!answer) {
+      throw new Error('No response received from AI');
+    }
+
+    // Only deduct credits and log usage on successful completion
+    const { error: creditError } = await supabaseClient
+      .from('profiles')
+      .update({
+        monthly_story_tokens: profile.monthly_story_tokens > 0 
+          ? profile.monthly_story_tokens - 1 
+          : profile.monthly_story_tokens,
+        purchased_story_credits: profile.monthly_story_tokens > 0 
+          ? profile.purchased_story_credits 
+          : profile.purchased_story_credits - 1
+      })
+      .eq('id', userId);
+
+    if (creditError) {
+      console.error('Error updating credits:', creditError);
+      // Continue anyway as we got a valid response
+    }
+
+    // Log successful prompt usage
     await supabaseClient
       .from('prompt_logs')
       .insert({
@@ -93,7 +117,7 @@ serve(async (req) => {
         response: answer,
         model: 'gpt-4o',
         tokens_used: response.usage?.total_tokens || 0,
-        cost_usd: (response.usage?.total_tokens || 0) * 0.00003, // Updated cost for GPT-4
+        cost_usd: (response.usage?.total_tokens || 0) * 0.00003,
         status: 'success',
         request_timestamp: new Date(startTime).toISOString(),
         response_timestamp: new Date(endTime).toISOString()
@@ -107,27 +131,27 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in interview function:', error);
 
-    // Log the error if we have user and story context
-    try {
-      const { userId, storyId } = await req.json();
-      if (userId && storyId) {
-        const supabaseClient = createClient(
-          Deno.env.get('SUPABASE_URL') ?? '',
-          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-        );
-
-        await supabaseClient
-          .from('prompt_logs')
-          .insert({
-            user_id: userId,
-            story_id: storyId,
-            status: 'error',
-            error_message: error.message,
-            request_timestamp: new Date().toISOString()
-          });
+    // Log error without consuming credits
+    if (supabaseClient) {
+      try {
+        const { userId, storyId } = await req.json();
+        if (userId && storyId) {
+          await supabaseClient
+            .from('prompt_logs')
+            .insert({
+              user_id: userId,
+              story_id: storyId,
+              status: 'error',
+              error_message: error.message,
+              request_timestamp: new Date(startTime).toISOString(),
+              response_timestamp: new Date().toISOString(),
+              cost_usd: 0,
+              tokens_used: 0
+            });
+        }
+      } catch (logError) {
+        console.error('Error logging failure:', logError);
       }
-    } catch (logError) {
-      console.error('Error logging failure:', logError);
     }
 
     return new Response(
