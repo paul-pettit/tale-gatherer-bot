@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -8,8 +7,9 @@ import { MessageInput } from "./MessageInput"
 import { ChatMessages } from "./ChatMessages"
 import { toast } from "sonner"
 import { supabase } from "@/integrations/supabase/client"
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog"
 import { PreviewDialog } from "./PreviewDialog"
+import { useFreeTier } from "@/hooks/useFreeTier"
 
 interface ChatSessionProps {
   sessionId: string
@@ -23,9 +23,18 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
   const [showPreviewDialog, setShowPreviewDialog] = useState(false)
   const [previewContent, setPreviewContent] = useState('')
   const { user } = useAuth()
-  const { messages, isLoading, isFinishing, sendMessage, finishStory } = useChat(sessionId, question)
+  const { remainingStories } = useFreeTier()
+  const { 
+    messages, 
+    isLoading, 
+    isFinishing, 
+    sendMessage, 
+    finishStory,
+    showCreditConfirmation,
+    handleConfirmCredit,
+    handleCancelCredit
+  } = useChat(sessionId, question)
 
-  // Check for failed sessions on mount
   useEffect(() => {
     const checkFailedSession = async () => {
       if (!sessionId) return
@@ -59,7 +68,6 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
     try {
       const storyContent = await finishStory()
       
-      // Save preview content and update session status
       await supabase
         .from('chat_sessions')
         .update({ 
@@ -115,7 +123,6 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
 
   const handleRecoveryAttempt = async () => {
     try {
-      // Reset session status
       await supabase
         .from('chat_sessions')
         .update({ status: 'active', last_error: null })
@@ -160,6 +167,22 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
           </div>
         </CardContent>
       </Card>
+
+      <AlertDialog open={showCreditConfirmation}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Start AI Interview</AlertDialogTitle>
+            <AlertDialogDescription>
+              Starting this conversation will use 1 credit from your {remainingStories} remaining credits. 
+              Would you like to proceed?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelCredit}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmCredit}>Start Interview</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={showRecoveryDialog} onOpenChange={setShowRecoveryDialog}>
         <AlertDialogContent>

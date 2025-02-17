@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 
 interface Message {
   role: 'user' | 'assistant'
@@ -13,6 +13,8 @@ export function useChat(sessionId: string, question: string) {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isFinishing, setIsFinishing] = useState(false)
+  const [showCreditConfirmation, setShowCreditConfirmation] = useState(false)
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null)
   const { user } = useAuth()
   
   // Load initial messages
@@ -53,10 +55,13 @@ export function useChat(sessionId: string, question: string) {
     loadMessages()
   }, [sessionId, question])
 
-  const sendMessage = async (newMessage: string) => {
-    if (!newMessage.trim() || isLoading || !user) return
+  const processPendingMessage = async () => {
+    if (!pendingMessage || !user) return;
+    const message = pendingMessage;
+    setPendingMessage(null);
+    setShowCreditConfirmation(false);
 
-    const userMessage = { role: 'user' as const, content: newMessage }
+    const userMessage = { role: 'user' as const, content: message }
     setMessages(prev => [...prev, userMessage])
     setIsLoading(true)
 
@@ -76,13 +81,13 @@ export function useChat(sessionId: string, question: string) {
         .insert({
           session_id: sessionId,
           role: 'user',
-          content: newMessage
+          content: message
         })
 
       // Get AI response
       const response = await supabase.functions.invoke('ai-interviewer', {
         body: {
-          message: newMessage,
+          message: message,
           messages: messages,
           context: question,
           userId: user.id,
@@ -112,6 +117,31 @@ export function useChat(sessionId: string, question: string) {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const sendMessage = async (newMessage: string) => {
+    if (!newMessage.trim() || isLoading || !user) return
+
+    // If this is the first user message (excluding the initial AI greeting)
+    if (messages.length === 1 && messages[0].role === 'assistant') {
+      setPendingMessage(newMessage)
+      setShowCreditConfirmation(true)
+      return
+    }
+
+    // Otherwise, process message normally
+    setPendingMessage(newMessage)
+    await processPendingMessage()
+  }
+
+  const handleConfirmCredit = () => {
+    processPendingMessage()
+  }
+
+  const handleCancelCredit = () => {
+    setPendingMessage(null)
+    setShowCreditConfirmation(false)
+    toast.info('Message cancelled')
   }
 
   const finishStory = async (): Promise<string> => {
@@ -182,6 +212,9 @@ export function useChat(sessionId: string, question: string) {
     isLoading,
     isFinishing,
     sendMessage,
-    finishStory
+    finishStory,
+    showCreditConfirmation,
+    handleConfirmCredit,
+    handleCancelCredit
   }
 }
