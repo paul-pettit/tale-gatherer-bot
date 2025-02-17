@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -91,7 +92,7 @@ export default function NewStoryPage() {
     try {
       console.log('Creating story for question:', question.id);
       
-      // Create a new story draft
+      // Create a new story draft - now with is_shared_with_family set to false by default
       const { data: storyData, error: storyError } = await supabase
         .from('stories')
         .insert({
@@ -99,7 +100,8 @@ export default function NewStoryPage() {
           content: '',
           author_id: user.id,
           status: 'draft',
-          question_id: question.id
+          question_id: question.id,
+          is_shared_with_family: false // explicitly set to false for new stories
         })
         .select()
         .single();
