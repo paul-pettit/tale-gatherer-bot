@@ -1,5 +1,5 @@
 
-import { Users, BadgeDollarSign, BadgeCheck } from "lucide-react";
+import { Users, BadgeDollarSign, BadgeCheck, Pen, Heart, BookOpen } from "lucide-react";
 
 export function BenefitsSection() {
   return (
@@ -8,6 +8,41 @@ export function BenefitsSection() {
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
           Tell Your Story Well
         </h2>
+
+        {/* New explanation section */}
+        <div className="max-w-4xl mx-auto mb-20">
+          <p className="text-xl text-center text-muted-foreground mb-12">
+            MemoryStitcher is your personal AI-powered storytelling companion, helping you craft meaningful family narratives through guided conversations and thoughtful questions.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                <Pen className="w-8 h-8 text-primary-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Guided Writing</h3>
+              <p className="text-muted-foreground">Interactive conversations that help you unlock and shape your memories</p>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                <Heart className="w-8 h-8 text-primary-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Family Connection</h3>
+              <p className="text-muted-foreground">Share stories with loved ones and preserve your family's legacy</p>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                <BookOpen className="w-8 h-8 text-primary-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Living Library</h3>
+              <p className="text-muted-foreground">Build a collection of meaningful stories that grows with your family</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Original cards section */}
         <div className="grid md:grid-cols-3 gap-12">
           <div className="text-center">
             <div className="bg-card rounded-lg p-6 h-full shadow-sm flex flex-col">
