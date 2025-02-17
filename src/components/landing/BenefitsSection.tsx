@@ -5,39 +5,39 @@ export function BenefitsSection() {
   return (
     <div className="py-24 bg-background">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-[#2C1810]">
           Tell Your Story Well
         </h2>
 
         {/* New explanation section */}
         <div className="max-w-4xl mx-auto mb-20">
-          <p className="text-xl text-center text-muted-foreground mb-12">
+          <p className="text-xl text-center text-muted-foreground mb-16 leading-relaxed">
             MemoryStitcher is your personal AI-powered storytelling companion, helping you craft meaningful family narratives through guided conversations and thoughtful questions.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-                <Pen className="w-8 h-8 text-primary-foreground" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+            <div className="flex flex-col items-center group hover:transform hover:scale-105 transition-transform duration-300">
+              <div className="w-20 h-20 rounded-full bg-[hsl(26,60%,85%)] flex items-center justify-center mb-6 shadow-lg group-hover:bg-[hsl(26,60%,80%)] transition-colors">
+                <Pen className="w-10 h-10 text-[#2C1810]" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Guided Writing</h3>
-              <p className="text-muted-foreground">Interactive conversations that help you unlock and shape your memories</p>
+              <h3 className="text-xl font-semibold mb-3 text-[#2C1810]">Guided Writing</h3>
+              <p className="text-muted-foreground leading-relaxed">Interactive conversations that help you unlock and shape your memories</p>
             </div>
             
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-                <Heart className="w-8 h-8 text-primary-foreground" />
+            <div className="flex flex-col items-center group hover:transform hover:scale-105 transition-transform duration-300">
+              <div className="w-20 h-20 rounded-full bg-[hsl(26,60%,85%)] flex items-center justify-center mb-6 shadow-lg group-hover:bg-[hsl(26,60%,80%)] transition-colors">
+                <Heart className="w-10 h-10 text-[#2C1810]" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Family Connection</h3>
-              <p className="text-muted-foreground">Share stories with loved ones and preserve your family's legacy</p>
+              <h3 className="text-xl font-semibold mb-3 text-[#2C1810]">Family Connection</h3>
+              <p className="text-muted-foreground leading-relaxed">Share stories with loved ones and preserve your family's legacy</p>
             </div>
             
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-                <BookOpen className="w-8 h-8 text-primary-foreground" />
+            <div className="flex flex-col items-center group hover:transform hover:scale-105 transition-transform duration-300">
+              <div className="w-20 h-20 rounded-full bg-[hsl(26,60%,85%)] flex items-center justify-center mb-6 shadow-lg group-hover:bg-[hsl(26,60%,80%)] transition-colors">
+                <BookOpen className="w-10 h-10 text-[#2C1810]" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Living Library</h3>
-              <p className="text-muted-foreground">Build a collection of meaningful stories that grows with your family</p>
+              <h3 className="text-xl font-semibold mb-3 text-[#2C1810]">Living Library</h3>
+              <p className="text-muted-foreground leading-relaxed">Build a collection of meaningful stories that grows with your family</p>
             </div>
           </div>
         </div>
