@@ -665,6 +665,7 @@ export type Database = {
           created_at: string
           family_id: string | null
           id: string
+          is_shared_with_family: boolean | null
           last_auto_save: string | null
           question_id: string | null
           status: Database["public"]["Enums"]["story_status"] | null
@@ -678,6 +679,7 @@ export type Database = {
           created_at?: string
           family_id?: string | null
           id?: string
+          is_shared_with_family?: boolean | null
           last_auto_save?: string | null
           question_id?: string | null
           status?: Database["public"]["Enums"]["story_status"] | null
@@ -691,6 +693,7 @@ export type Database = {
           created_at?: string
           family_id?: string | null
           id?: string
+          is_shared_with_family?: boolean | null
           last_auto_save?: string | null
           question_id?: string | null
           status?: Database["public"]["Enums"]["story_status"] | null
