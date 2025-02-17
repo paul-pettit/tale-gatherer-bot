@@ -11,7 +11,7 @@ export default function Index() {
   const { remainingStories, isFreeTier } = useFreeTier();
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <Navigation isLoggedIn={!!user} />
       <HeroSection 
         isFreeTier={isFreeTier} 
@@ -20,6 +20,9 @@ export default function Index() {
       />
       <BenefitsSection />
       <FamilyPlansSection />
+      <footer className="py-8 text-center text-sm text-muted-foreground border-t border-border">
+        <p>Copyright © 2025 MemoryStitcher. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
