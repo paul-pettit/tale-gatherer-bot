@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/integrations/supabase/client"
 import { StoryCard } from "@/components/stories/StoryCard"
 import { Button } from "@/components/ui/button"
-import { Pagination } from "@/components/ui/pagination"
+import { PaginationComponent } from "@/components/ui/pagination"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -66,7 +66,7 @@ export default function StoryLibraryPage() {
 
       {totalPages > 1 && (
         <div className="flex justify-center">
-          <Pagination
+          <PaginationComponent
             currentPage={page}
             totalPages={totalPages}
             onPageChange={setPage}
