@@ -69,9 +69,6 @@ export default function StoryDetailPage() {
     )
   }
 
-  // Format the title to remove the category prefix
-  const displayTitle = story.title.replace(`Story about ${story.questions?.category}`, story.questions?.category || '')
-
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <div className="mb-8">
@@ -85,7 +82,7 @@ export default function StoryDetailPage() {
         </Button>
       </div>
 
-      <h1 className="text-4xl font-bold mb-8 font-serif">{displayTitle}</h1>
+      <h1 className="text-4xl font-bold mb-8 font-serif">{story.title}</h1>
 
       <Card className="bg-card border-none shadow-lg">
         <CardHeader className="space-y-4">
