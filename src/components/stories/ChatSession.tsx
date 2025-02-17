@@ -37,15 +37,17 @@ export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessio
 
   return (
     <Card className="h-[600px] flex flex-col">
-      <CardHeader>
+      <CardHeader className="flex-none">
         <CardTitle>Interview Session</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col">
-        <ChatMessages 
-          messages={messages}
-          isLoading={isLoading}
-        />
-        <div className="mt-4 space-y-2">
+      <CardContent className="flex-1 flex flex-col overflow-hidden p-4">
+        <div className="flex-1 overflow-hidden mb-4">
+          <ChatMessages 
+            messages={messages}
+            isLoading={isLoading}
+          />
+        </div>
+        <div className="flex-none space-y-2">
           <MessageInput
             newMessage={newMessage}
             setNewMessage={setNewMessage}

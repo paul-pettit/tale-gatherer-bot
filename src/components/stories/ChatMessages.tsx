@@ -17,7 +17,6 @@ interface ChatMessagesProps {
 export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
-  // Scroll to bottom when messages change
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
@@ -27,8 +26,8 @@ export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
   }, [messages])
 
   return (
-    <ScrollArea className="flex-1 pr-4">
-      <div className="space-y-4">
+    <ScrollArea className="h-full pr-4">
+      <div className="space-y-4 pb-4">
         {messages.map((message, index) => (
           <ChatMessage
             key={index}
