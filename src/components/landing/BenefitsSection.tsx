@@ -5,9 +5,19 @@ export function BenefitsSection() {
   return (
     <div className="py-24 bg-background">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-[#2C1810]">
-          Tell Your Story Well
-        </h2>
+        {/* Updated heading section with background image */}
+        <div className="relative mb-12 rounded-2xl overflow-hidden">
+          <img 
+            src="/lovable-uploads/14f2a7aa-5cf8-43f1-94f6-92bb2fbc17e3.png"
+            alt="Elderly couple reading together" 
+            className="w-full h-48 md:h-64 object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/90 to-[#2C1810]/60 flex items-center justify-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-white px-4 drop-shadow-lg">
+              Tell Your Story Well
+            </h2>
+          </div>
+        </div>
 
         {/* New explanation section */}
         <div className="max-w-4xl mx-auto mb-20">
