@@ -1,3 +1,4 @@
+import React from 'react';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,12 @@ export function MessageInput({
         onChange={(e) => setNewMessage(e.target.value)}
         placeholder="Type your message..."
         disabled={isDisabled}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            onSend(e);
+          }
+        }}
       />
       <Button type="submit" disabled={isDisabled}>
         Send

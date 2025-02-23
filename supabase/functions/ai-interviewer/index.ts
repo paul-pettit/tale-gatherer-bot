@@ -55,15 +55,20 @@ serve(async (req) => {
 
     const { data: systemPrompts, error: promptError } = await supabaseClient
       .from('system_prompts')
-      .select('content')
-      .eq('type', 'interview')
-      .maybeSingle();
+      .select('content, ab_test_group')
+      .eq('type', 'interview');
 
-    if (promptError || !systemPrompts?.content) {
+    if (promptError || !systemPrompts?.length) {
       throw new Error('Failed to fetch system prompt');
     }
 
-    const openai = new OpenAI({ apiKey: openAiKey });
+    // Select a prompt based on A/B test group
+    const activePrompts = systemPrompts.filter(prompt => prompt.ab_test_group === null || prompt.ab_test_group === 'A'); // Example: Use group A or prompts with no group
+    const systemPrompt = activePrompts[Math.floor(Math.random() * activePrompts.length)]?.content;
+
+    if (!systemPrompt) {
+      throw new Error('No active system prompts found');
+    }
 
     // Get user profile for system prompt context
     const { data: profile } = await supabaseClient
@@ -73,17 +78,19 @@ serve(async (req) => {
       .single();
 
     // Format system prompt with user context
-    const systemPrompt = systemPrompts.content
-      .replace('${context}', context || '')
+    const formattedSystemPrompt = systemPrompt
+      ?.replace('${context}', context || '')
       .replace('${firstName}', profile?.first_name || '')
       .replace('${age}', profile?.age?.toString() || '')
       .replace('${hometown}', profile?.hometown || '')
       .replace('${gender}', profile?.gender || '');
+      
+    const openai = new OpenAI({ apiKey: openAiKey });
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        { role: 'system', content: systemPrompt },
+        { role: 'system', content: formattedSystemPrompt },
         ...messages,
         { role: 'user', content: message }
       ],
