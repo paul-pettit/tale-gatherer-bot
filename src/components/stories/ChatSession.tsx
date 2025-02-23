@@ -29,7 +29,9 @@ export function ChatSession({ sessionId: initialSessionId, question, onStoryComp
   const [sessionId, setSessionId] = useState(storedSessionId);
 
   useEffect(() => {
-    localStorage.setItem('chatSessionId', sessionId);
+    if (sessionId) {
+      localStorage.setItem('chatSessionId', sessionId);
+    }
   }, [sessionId]);
 
   const {
