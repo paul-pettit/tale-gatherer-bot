@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ChatProvider } from "@/context/ChatContext";
 import { StoryGuard } from "@/components/StoryGuard";
 import AppLayout from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
@@ -30,10 +31,11 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+      <ChatProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/auth/verification-pending" element={<VerificationPendingPage />} />
@@ -70,7 +72,8 @@ const App = () => (
             />
           </Routes>
         </BrowserRouter>
-      </TooltipProvider>
+        </TooltipProvider>
+      </ChatProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

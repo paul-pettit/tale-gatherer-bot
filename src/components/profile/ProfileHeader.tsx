@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 
 import { useAuth } from "@/hooks/useAuth";
 import { AvatarUpload } from "./AvatarUpload";
@@ -47,6 +48,9 @@ export function ProfileHeader({
           <span className="font-medium">{remainingStories}</span> {remainingStories === 1 ? 'credit' : 'credits'} remaining
         </p>
       </div>
+      <Button onClick={() => window.location.href = '/stories/new'}>
+        Active Chat
+      </Button>
     </div>
   );
 }
