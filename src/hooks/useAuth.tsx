@@ -22,16 +22,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check active sessions and sets the user
     const initializeAuth = async () => {
       try {
-        const cachedUser = localStorage.getItem('userProfile');
-        if (cachedUser) {
-          setUser(JSON.parse(cachedUser));
-          setLoading(false);
-        } else {
-          const { data: { session } } = await supabase.auth.getSession();
-          setUser(session?.user ?? null);
-          localStorage.setItem('userProfile', JSON.stringify(session?.user ?? null));
-          setLoading(false);
-        }
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
+        setLoading(false);
       } catch (error) {
         console.error('Error checking auth session:', error);
         setLoading(false);
@@ -43,7 +36,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for changes on auth state (sign in, sign out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
-      localStorage.setItem('userProfile', JSON.stringify(session?.user ?? null));
       setLoading(false);
 
       // If the user just confirmed their email, redirect to verification success
@@ -51,6 +43,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         window.location.href = '/auth/verification-success';
       }
     });
+
+    localStorage.removeItem('chatSessionId');
 
     return () => {
       subscription.unsubscribe();

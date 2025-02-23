@@ -117,13 +117,7 @@ export default function StoryDetailPage() {
           )}
         </CardHeader>
         <CardContent>
-          {storedSessionId ? (
-            <ChatSession
-              sessionId={storedSessionId}
-              question={story.questions?.question || ""}
-              onStoryComplete={ () => {} }
-            />
-          ) : isEditing ? (
+          {isEditing ? (
             <StoryForm
               title={story.title}
               content={story.content}
