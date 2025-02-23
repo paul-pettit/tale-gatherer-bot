@@ -17,18 +17,26 @@ interface ChatSessionProps {
   onStoryComplete: (content: string) => void
 }
 
-export function ChatSession({ sessionId, question, onStoryComplete }: ChatSessionProps) {
+export function ChatSession({ sessionId: initialSessionId, question, onStoryComplete }: ChatSessionProps) {
   const [newMessage, setNewMessage] = useState('')
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false)
   const [showPreviewDialog, setShowPreviewDialog] = useState(false)
   const [previewContent, setPreviewContent] = useState('')
   const { user } = useAuth()
   const { remainingStories } = useFreeTier()
-  const { 
-    messages, 
-    isLoading, 
-    isFinishing, 
-    sendMessage, 
+  
+  const storedSessionId = localStorage.getItem('chatSessionId') || initialSessionId;
+  const [sessionId, setSessionId] = useState(storedSessionId);
+
+  useEffect(() => {
+    localStorage.setItem('chatSessionId', sessionId);
+  }, [sessionId]);
+
+  const {
+    messages,
+    isLoading,
+    isFinishing,
+    sendMessage,
     finishStory,
     showCreditConfirmation,
     handleConfirmCredit,

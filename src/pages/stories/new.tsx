@@ -141,6 +141,7 @@ export default function NewStoryPage() {
 
       setSelectedQuestion(question);
       setChatSessionId(sessionData.id);
+      localStorage.setItem('chatSessionId', sessionData.id);
       
       // Decrement story token after successful creation
       decrementStoryToken();
