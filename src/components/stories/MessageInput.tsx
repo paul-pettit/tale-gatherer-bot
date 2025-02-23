@@ -17,7 +17,7 @@ export function MessageInput({
   isDisabled 
 }: MessageInputProps) {
   return (
-    <form onSubmit={onSend} className="flex gap-2">
+    <form className="flex gap-2">
       <Input
         value={newMessage}
         onChange={(e) => setNewMessage(e.target.value)}
