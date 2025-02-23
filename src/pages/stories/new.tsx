@@ -214,7 +214,7 @@ export default function NewStoryPage() {
                 <h2 className="text-4xl font-serif font-bold mb-4">Tell Your Story Well</h2>
                 <Separator className="w-24 mx-auto my-6" />
                 <p className="text-lg text-muted-foreground">
-                  Choose a prompt below to begin your interview. Each question is designed 
+                  Choose a prompt below to begin your interview. Each question is designed
                   to draw out the meaningful moments of your life story.
                 </p>
                 <Button
@@ -238,13 +238,13 @@ export default function NewStoryPage() {
                 ))}
               </div>
             </>
-          ) : storedSessionId ? (
+          ) : (
             <ChatSession
-              sessionId={storedSessionId}
+              sessionId={storedSessionId || ""}
               question={selectedQuestion.question}
               onStoryComplete={handleStoryComplete}
             />
-          ) : null}
+          )}
         </CardContent>
       </Card>
     </div>
