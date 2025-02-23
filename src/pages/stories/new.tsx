@@ -26,7 +26,8 @@ export default function NewStoryPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
-  const [chatSessionId, setChatSessionId] = useState<string | null>(null);
+  const storedSessionId = localStorage.getItem('chatSessionId');
+  const [chatSessionId, setChatSessionId] = useState<string | null>(storedSessionId);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -231,9 +232,9 @@ export default function NewStoryPage() {
                 ))}
               </div>
             </>
-          ) : chatSessionId ? (
+          ) : storedSessionId ? (
             <ChatSession
-              sessionId={chatSessionId}
+              sessionId={storedSessionId}
               question={selectedQuestion.question}
               onStoryComplete={handleStoryComplete}
             />
