@@ -17,6 +17,7 @@ export default function StoryDetailPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
+  const storedSessionId = localStorage.getItem('chatSessionId');
 
   const { data: story, isLoading } = useQuery({
     queryKey: ['story', id],
@@ -116,7 +117,13 @@ export default function StoryDetailPage() {
           )}
         </CardHeader>
         <CardContent>
-          {isEditing ? (
+          {storedSessionId ? (
+            <ChatSession
+              sessionId={storedSessionId}
+              question={story.questions?.question || ""}
+              onStoryComplete={ () => {} }
+            />
+          ) : isEditing ? (
             <StoryForm
               title={story.title}
               content={story.content}
