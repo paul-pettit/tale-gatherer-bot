@@ -48,7 +48,7 @@ export function ProfileHeader({
           <span className="font-medium">{remainingStories}</span> {remainingStories === 1 ? 'credit' : 'credits'} remaining
         </p>
       </div>
-      <Button onClick={() => window.location.href = '/stories/new'}>
+      <Button onClick={() => window.location.href = `/stories/new?sessionId=${localStorage.getItem('chatSessionId')}` }>
         Active Chat
       </Button>
     </div>
