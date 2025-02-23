@@ -144,7 +144,7 @@ export function useChat(sessionId: string, question: string) {
     toast.info('Message cancelled')
   }
 
-  const finishStory = async (): Promise<string> => {
+  const finishStory = async (): Promise<{ answer: any; storyContent: any }> => {
     if (messages.length < 4) {
       toast.error('Please have a longer conversation before finishing')
       throw new Error('Conversation too short')
@@ -188,7 +188,10 @@ export function useChat(sessionId: string, question: string) {
         .update({ status: 'completed' })
         .eq('id', sessionId)
 
-      return response.data.answer
+      return {
+        answer: response.data.answer,
+        storyContent: response.data.storyContent
+      }
     } catch (error) {
       console.error('Error generating story:', error)
       // Update session status to failed

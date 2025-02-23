@@ -43,7 +43,9 @@ export function ChatSession({ sessionId: initialSessionId, question, onStoryComp
     showCreditConfirmation,
     handleConfirmCredit,
     handleCancelCredit
-  } = useChat(sessionId, question)
+  } = useChat(sessionId, question);
+
+  const [storyContent, setStoryContent] = useState('');
 
   useEffect(() => {
     const checkFailedSession = async () => {
@@ -76,17 +78,17 @@ export function ChatSession({ sessionId: initialSessionId, question, onStoryComp
 
   const handleFinish = async () => {
     try {
-      const storyContent = await finishStory()
-      
+      const { answer, storyContent } = await finishStory()
+
       await supabase
         .from('chat_sessions')
-        .update({ 
+        .update({
           preview_content: storyContent,
           status: 'preview'
         })
         .eq('id', sessionId)
 
-      setPreviewContent(storyContent)
+      setPreviewContent(storyContent || "")
       setShowPreviewDialog(true)
     } catch (error) {
       // Error is already handled in the hook

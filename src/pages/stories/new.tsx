@@ -27,9 +27,15 @@ export default function NewStoryPage() {
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const storedSessionId = localStorage.getItem('chatSessionId');
-  const [chatSessionId, setChatSessionId] = useState<string | null>(storedSessionId);
+  const [chatSessionId, setChatSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    if (storedSessionId) {
+      setChatSessionId(storedSessionId);
+    }
+  }, [storedSessionId]);
 
   const getRandomQuestions = (questions: Question[]) => {
     return [...questions]

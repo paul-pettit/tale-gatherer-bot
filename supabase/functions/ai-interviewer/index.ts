@@ -100,6 +100,7 @@ serve(async (req) => {
 
     const endTime = Date.now();
     const answer = response.choices[0]?.message?.content;
+    const storyContent = isFinishing ? answer : null;
     
     if (!answer) {
       throw new Error('No response received from AI');
@@ -141,7 +142,7 @@ serve(async (req) => {
       });
 
     return new Response(
-      JSON.stringify({ answer }),
+      JSON.stringify({ answer, storyContent }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
