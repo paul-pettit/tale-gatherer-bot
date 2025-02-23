@@ -34,23 +34,6 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Test Supabase connection
-    try {
-      const { data: testQuestion, error: testError } = await supabaseClient
-        .from('questions')
-        .select('id')
-        .limit(1)
-        .single();
-
-      if (testError) {
-        throw new Error(`Failed to connect to Supabase: ${testError.message}`);
-      }
-
-      console.log('Successfully connected to Supabase:', testQuestion?.id);
-    } catch (error: any) {
-      throw new Error(`Failed to connect to Supabase: ${error.message}`);
-    }
-
     // Check if user has enough credits only when it's their first message
     if (messages.length === 1 && messages[0].role === 'assistant') {
       const { data: profile, error: profileError } = await supabaseClient
