@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { AuthFormProvider } from '@/components/auth/AuthFormContext';
+import { SUPABASE_PUBLISHABLE_KEY } from '@/integrations/supabase/client';
 
 export default function AuthPage() {
   const [email, setEmail] = useState('');
@@ -22,11 +23,16 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
+      console.log('Starting authentication process:', isSignUp ? 'signup' : 'signin');
+      console.log('Email format:', email.includes('@') && email.includes('.'));
+      
       if (isSignUp) {
+        console.log('Attempting signup...');
         const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
         });
+        console.log('Signup response:', signUpError ? 'Error occurred' : 'Success');
 
         if (signUpError) throw signUpError;
 
@@ -58,13 +64,57 @@ export default function AuthPage() {
         toast.success('Registration successful! Please check your email to verify your account.');
         navigate('/auth/verification-pending');
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        console.log('Attempting signin...');
+        
+        // Try the standard Supabase auth first
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (error) {
+          console.error('Supabase auth error:', error);
+          
+          // If that fails, try a raw request for debugging
+          try {
+            const response = await fetch('https://bykodzpccfujhxighpzi.supabase.co/auth/v1/token?grant_type=password', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_PUBLISHABLE_KEY,
+              },
+              body: JSON.stringify({ email, password }),
+            });
+            
+            const responseText = await response.text();
+            console.log('Raw auth response:', {
+              status: response.status,
+              statusText: response.statusText,
+              headers: Object.fromEntries(response.headers.entries()),
+              body: responseText,
+            });
+          } catch (fetchError) {
+            console.error('Raw auth request failed:', fetchError);
+          }
+          
+          throw error;
+        }
+
+        console.log('Signin successful');
         toast.success('Welcome back!');
         navigate('/');
       }
     } catch (error: any) {
-      toast.error(error.message);
+      console.error('Authentication error:', {
+        message: error.message,
+        status: error.status,
+        name: error.name,
+        details: error.details,
+        statusText: error.statusText,
+        response: error.response,
+        data: error.data
+      });
+      toast.error(error.message || 'Authentication failed');
     } finally {
       setIsLoading(false);
     }

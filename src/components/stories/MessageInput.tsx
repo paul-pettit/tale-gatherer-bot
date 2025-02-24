@@ -1,23 +1,27 @@
 import React from 'react';
-
+import { useChatContext } from '@/context/ChatContext';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface MessageInputProps {
-  newMessage: string;
-  setNewMessage: (message: string) => void;
-  onSend: (e: React.FormEvent) => void;
   isDisabled: boolean;
 }
 
-export function MessageInput({ 
-  newMessage, 
-  setNewMessage, 
-  onSend, 
-  isDisabled 
+export function MessageInput({
+  isDisabled
 }: MessageInputProps) {
+  const {  setChatSessionId } = useChatContext();
+  const [newMessage, setNewMessage] = React.useState('');
+
+  const handleSend = () => {
+    if (!newMessage.trim()) return;
+    // Send message logic here (to be implemented later)
+    console.log('Sending message:', newMessage);
+    setNewMessage('');
+  };
+
   return (
-    <form className="flex gap-2">
+    <div className="flex gap-2">
       <Input
         value={newMessage}
         onChange={(e) => setNewMessage(e.target.value)}
@@ -26,13 +30,13 @@ export function MessageInput({
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            onSend(e);
+            handleSend();
           }
         }}
       />
-      <Button type="submit" disabled={isDisabled}>
+      <Button type="button" disabled={isDisabled} onClick={handleSend}>
         Send
       </Button>
-    </form>
+    </div>
   );
 }

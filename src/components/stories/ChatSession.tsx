@@ -88,7 +88,7 @@ export function ChatSession({ sessionId: initialSessionId, question, onStoryComp
         })
         .eq('id', sessionId)
 
-      setPreviewContent(storyContent || "")
+      setPreviewContent(storyContent ?? "")
       setShowPreviewDialog(true)
     } catch (error) {
       // Error is already handled in the hook
