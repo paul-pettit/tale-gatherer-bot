@@ -26,10 +26,5 @@ export function ConvexClientProvider({ children }: ConvexClientProviderProps) {
     return <div>Loading...</div>;
   }
 
-  if (!isValidElement(children)) {
-    console.error("Invalid children passed to ConvexClientProvider:", children);
-    return <div>Error: Invalid children</div>;
-  }
-
   return <ConvexProvider client={convex}>{children}</ConvexProvider>;
 }
