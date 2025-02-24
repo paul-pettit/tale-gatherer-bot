@@ -128,12 +128,12 @@ Memory Stitcher is an AI-powered biographical storytelling platform that conduct
 
 ## Technical Stack
 - [x] Frontend: React with TypeScript
-- [x] Backend: Supabase
+- [x] Backend: Supabase (for authentication, database, and other backend functionalities)
   - [x] Row Level Security (RLS) policies
   - [x] User authentication
   - [x] Database schema
+- [x] Chat Backend: Convex
 - [ ] AI: OpenAI API for interviewer
-- [x] Real-time: Supabase Realtime
 - [x] Database: PostgreSQL (via Supabase)
 
 ## Development Phases

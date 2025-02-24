@@ -36,6 +36,16 @@ export function Navigation({ isLoggedIn }: NavigationProps) {
             </div>
           )}
         </div>
+        {isLoggedIn && (
+          <div className="space-x-4">
+            <Button
+              onClick={() => navigate("/stories")}
+              className="bg-white text-black hover:bg-white/90"
+            >
+              Write a Story
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

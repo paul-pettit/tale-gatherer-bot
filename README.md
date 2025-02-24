@@ -38,13 +38,15 @@ Memory Stitcher is an AI-powered biographical storytelling platform that helps u
 - Tanstack Query for data fetching
 - React Router for navigation
 
-### Backend (Supabase)
-- PostgreSQL database
-- Row Level Security (RLS)
-- Real-time subscriptions
-- Edge Functions
-- File storage
-- Authentication
+### Backend
+- Supabase (for authentication, database, and other backend functionalities)
+  - PostgreSQL database
+  - Row Level Security (RLS)
+  - Real-time subscriptions
+  - Edge Functions
+  - File storage
+  - Authentication
+- Convex (for chat functionality)
 
 ### Third-party Integrations
 - OpenAI for AI interviewer

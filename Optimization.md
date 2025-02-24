@@ -159,6 +159,8 @@ Memory Stitcher has the potential to be a successful AI-powered biographical sto
 
 ## 4. Technical Infrastructure Improvements
 
+This section outlines recommendations for optimizing the technical infrastructure of Memory Stitcher, which includes both Supabase and Convex.
+
 ### 4.1. Performance Optimization
 
 *   **Recommendation:** Optimize the performance of the application, including database queries, API calls, and frontend rendering, to improve user experience and reduce infrastructure costs.
