@@ -10,12 +10,10 @@ interface AppLayoutProps {
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { user } = useAuth();
   const location = useLocation();
-  const isHomePage = location.pathname === "/";
   const isAuthPage = location.pathname.startsWith("/auth");
 
-  // Don't show AppNavigation on home page (it has its own navigation)
-  // or auth pages
-  const showAppNavigation = user && !isHomePage && !isAuthPage;
+  // Only hide AppNavigation on auth pages
+  const showAppNavigation = user && !isAuthPage;
 
   return (
     <div className="min-h-screen">

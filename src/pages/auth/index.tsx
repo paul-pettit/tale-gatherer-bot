@@ -102,7 +102,7 @@ export default function AuthPage() {
 
         console.log('Signin successful');
         toast.success('Welcome back!');
-        navigate('/');
+        navigate('/stories');
       }
     } catch (error: any) {
       console.error('Authentication error:', {
