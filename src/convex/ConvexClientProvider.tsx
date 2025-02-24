@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
+const convex = new ConvexReactClient(import.meta.env.CONVEX_URL);
 
 interface ConvexClientProviderProps {
   children: ReactNode;
