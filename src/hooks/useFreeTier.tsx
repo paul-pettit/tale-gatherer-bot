@@ -51,12 +51,16 @@ export function useFreeTier() {
     },
   });
 
-  // Calculate if the user can create a story based on available tokens
-  const availableTokens = (freeTierInfo?.monthly_story_tokens || 0) + (freeTierInfo?.purchased_story_credits || 0);
-  const canCreateStory = availableTokens > 0;
+  // Calculate available tokens only if we have data
+  const availableTokens = freeTierInfo
+    ? (freeTierInfo.monthly_story_tokens || 0) + (freeTierInfo.purchased_story_credits || 0)
+    : null;
+
+  // Can create story if we're loading or have tokens
+  const canCreateStory = isLoading || (availableTokens !== null && availableTokens > 0);
   
   // Return remaining tokens including both monthly and purchased credits
-  const remainingStories = availableTokens;
+  const remainingStories = availableTokens ?? 0;
 
   return {
     isLoading,
