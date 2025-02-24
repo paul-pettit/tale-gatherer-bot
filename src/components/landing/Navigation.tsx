@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +8,11 @@ interface NavigationProps {
 export function Navigation({ isLoggedIn }: NavigationProps) {
   const navigate = useNavigate();
 
+  // If logged in, don't show this navigation
+  if (isLoggedIn) {
+    return null;
+  }
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/50 to-transparent">
       <div className="container mx-auto px-4">
@@ -16,36 +20,25 @@ export function Navigation({ isLoggedIn }: NavigationProps) {
           <img 
             src="/lovable-uploads/e32eb416-f89a-47ac-a548-fb5cd566fa06.png"
             alt="Memory Stitcher" 
-            className="h-20 w-auto"
+            className="h-20 w-auto cursor-pointer"
+            onClick={() => navigate("/")}
           />
-          {!isLoggedIn && (
-            <div className="space-x-4">
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/auth")}
-                className="text-white hover:bg-white/10"
-              >
-                Sign In
-              </Button>
-              <Button
-                onClick={() => navigate("/auth")}
-                className="bg-white text-black hover:bg-white/90"
-              >
-                Sign Up
-              </Button>
-            </div>
-          )}
-        </div>
-        {isLoggedIn && (
           <div className="space-x-4">
             <Button
-              onClick={() => navigate("/stories")}
+              variant="ghost"
+              onClick={() => navigate("/auth")}
+              className="text-white hover:bg-white/10"
+            >
+              Sign In
+            </Button>
+            <Button
+              onClick={() => navigate("/auth")}
               className="bg-white text-black hover:bg-white/90"
             >
-              Write a Story
+              Sign Up
             </Button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
