@@ -1,3 +1,4 @@
+import { isValidElement } from "react";
 import { ReactNode, useState, useEffect } from "react";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 
@@ -23,6 +24,11 @@ export function ConvexClientProvider({ children }: ConvexClientProviderProps) {
 
   if (isLoading || !convex) {
     return <div>Loading...</div>;
+  }
+
+  if (!isValidElement(children)) {
+    console.error("Invalid children passed to ConvexClientProvider:", children);
+    return <div>Error: Invalid children</div>;
   }
 
   return <ConvexProvider client={convex}>{children}</ConvexProvider>;
