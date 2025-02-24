@@ -1,13 +1,18 @@
-
 import { Navigate } from 'react-router-dom';
 import { useFreeTier } from '@/hooks/useFreeTier';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 export function StoryGuard({ children }: { children: React.ReactNode }) {
-  const { canCreateStory, isFreeTier, remainingStories } = useFreeTier();
+  const { user } = useAuth();
+  const { canCreateStory, isFreeTier } = useFreeTier();
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
 
   if (!canCreateStory) {
-    const message = isFreeTier 
+    const message = isFreeTier
       ? 'You have reached the limit of 5 free stories. Please upgrade to continue.'
       : 'You cannot create more stories at this time.';
     toast.error(message);
