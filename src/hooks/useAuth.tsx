@@ -34,13 +34,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
 
     // Listen for changes on auth state (sign in, sign out, etc.)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', { event, user: session?.user });
       setUser(session?.user ?? null);
       setLoading(false);
 
       // If the user just confirmed their email, redirect to verification success
       if (session?.user?.email_confirmed_at && window.location.pathname === '/auth/verification-pending') {
         window.location.href = '/auth/verification-success';
+      }
+
+      // Force navigation to /stories on successful sign in
+      if (event === 'SIGNED_IN' && window.location.pathname === '/auth') {
+        console.log('Forcing navigation to /stories after sign in');
+        window.location.href = '/stories';
       }
     });
 
